@@ -1,22 +1,18 @@
-MY STUDY STATION — PRO LEARNING
-Starter website package.
+MY STUDY STATION — STUDY NOTES UPDATE
 
-FILES:
-index.html       Landing page
-login.html       Login form
-register.html    Registration form
-pro.html         Student dashboard shell
-admin.html       Admin portal permission gate
-style.css        Purple/gold responsive design
-supabase.js      Supabase client config (replace placeholders)
-auth.js          Signup/login/password reset
-dashboard.js     Student profile/membership summary
-admin.js         Admin role verification
+This is a small update package containing:
+- pro.html: dashboard Study Notes link now opens notes.html
+- notes.html: Study Notes page
+- notes.js: create/search/delete and browser-local note saving
+- style.css: styles added for the note editor and note cards
 
 IMPORTANT:
-1. Replace YOUR_SUPABASE_PROJECT_URL and YOUR_SUPABASE_ANON_PUBLIC_KEY in supabase.js.
-2. Do NOT use or expose the Supabase service_role key.
-3. Supabase email confirmation and redirect URLs must be configured to your deployed website URL.
-4. Existing profile trigger should create profiles/student numbers; registration does not manually insert profile rows.
-5. Admin page checks the existing is_platform_admin RPC. The admin role must be assigned securely after account confirmation.
-6. This is the first starter package; modules such as resources, past papers, quizzes, chat, groups, and timetable UI require further integration/testing against RLS policies.
+Notes in this version save locally in the browser on this device. They do NOT yet sync to Supabase or another device. The module does not require email confirmation to test.
+
+How to update GitHub:
+1. Open your repository on GitHub.
+2. Upload these files to the repository root.
+3. For pro.html and style.css, choose to replace/overwrite the existing files.
+4. Add notes.html and notes.js as new files.
+5. Commit the changes to the main branch.
+6. Netlify should automatically redeploy. Wait for Published, then open the site and Study Notes.
