@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Student Progress | My Study Station</title>
+<style>
+:root{--bg:#100d25;--panel:#1d1738;--panel2:#271f49;--gold:#f4c542;--text:#f7f4ff;--muted:#b9b2d2;--line:#40365f;--danger:#ff7272}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
+header{padding:20px 16px;background:linear-gradient(135deg,#211747,#100d25);border-bottom:1px solid var(--line)}header .wrap,main{max-width:900px;margin:auto}
+h1{margin:0 0 6px;color:var(--gold);font-size:1.55rem}p{margin:0;color:var(--muted)}main{padding:16px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}h2{margin:0 0 14px;font-size:1.1rem}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px}.stat small{display:block;color:var(--muted)}.stat strong{font-size:1.5rem;color:var(--gold)}
+form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}label{display:block;color:var(--muted);font-size:.9rem}input,select,button{font:inherit}input,select{width:100%;margin-top:6px;padding:11px;border:1px solid var(--line);border-radius:10px;background:#120f2b;color:var(--text)}.full{grid-column:1/-1}
+button{border:0;border-radius:10px;padding:11px 14px;font-weight:700;cursor:pointer}.primary{background:var(--gold);color:#211747}.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}.danger{color:var(--danger)}
+.progress-track{height:12px;background:#120f2b;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin:8px 0}.progress-fill{height:100%;width:0;background:var(--gold);transition:width .2s}
+.entry{padding:12px;margin:9px 0;background:var(--panel2);border:1px solid var(--line);border-radius:12px;display:flex;justify-content:space-between;align-items:center;gap:12px}.entry strong{display:block}.entry small{color:var(--muted)}.empty{padding:12px;color:var(--muted);text-align:center}
+.chart{display:flex;align-items:flex-end;gap:8px;min-height:155px;overflow-x:auto;padding:10px 0}.bar-wrap{flex:1;min-width:42px;text-align:center}.bar{min-height:4px;background:var(--gold);border-radius:7px 7px 0 0;margin:0 auto;width:26px}.bar-wrap small{display:block;color:var(--muted);font-size:.72rem;margin-top:5px}.bar-wrap b{font-size:.75rem}
+@media(max-width:520px){form{grid-template-columns:1fr}.full{grid-column:auto}.entry{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style></head><body>
+<header><div class="wrap"><h1>📈 Student Progress Tracker</h1><p>Record quiz results and completed study sessions.</p></div></header>
+<main>
+<section class="panel"><h2>Your overview</h2><div class="stats">
+<div class="stat"><small>Quiz attempts</small><strong id="attemptCount">0</strong></div>
+<div class="stat"><small>Average quiz score</small><strong id="averageScore">0%</strong></div>
+<div class="stat"><small>Study sessions logged</small><strong id="studyCount">0</strong></div>
+<div class="stat"><small>Study time recorded</small><strong id="studyHours">0 min</strong></div>
+</div><p style="margin-top:14px">Quiz score average</p><div class="progress-track"><div class="progress-fill" id="averageFill"></div></div></section>
+<section class="panel"><h2>Record a quiz result</h2><form id="quizForm">
+<label>Subject<select id="quizSubject" required><option>Mathematics</option><option>English Language</option><option>Biology</option><option>Physics</option><option>Chemistry</option><option>Civic Education</option><option>Additional Mathematics</option><option>Computer Studies</option><option>Other</option></select></label>
+<label>Quiz name<input id="quizName" maxlength="90" placeholder="e.g. Algebra practice" required></label>
+<label>Score obtained<input id="score" type="number" min="0" step="1" required placeholder="e.g. 18"></label>
+<label>Total marks<input id="total" type="number" min="1" step="1" required placeholder="e.g. 20"></label>
+<label class="full">Date<input id="quizDate" type="date" required></label>
+<div class="full"><button class="primary" type="submit">Save quiz result</button></div></form></section>
+<section class="panel"><h2>Quiz score history</h2><div id="scoreChart" class="chart"></div><div id="quizList"></div></section>
+<section class="panel"><h2>Log a completed study session</h2><form id="studyForm">
+<label>Subject<select id="studySubject" required><option>Mathematics</option><option>English Language</option><option>Biology</option><option>Physics</option><option>Chemistry</option><option>Civic Education</option><option>Additional Mathematics</option><option>Computer Studies</option><option>Other</option></select></label>
+<label>Duration (minutes)<input id="duration" type="number" min="1" max="1440" step="1" required placeholder="e.g. 45"></label>
+<label class="full">Date<input id="studyDate" type="date" required></label>
+<label class="full">Topic studied (optional)<input id="studyTopic" maxlength="120" placeholder="e.g. Cell division"></label>
+<div class="full"><button class="primary" type="submit">Log completed session</button></div></form></section>
+<section class="panel"><h2>Completed study sessions</h2><div id="studyList"></div></section>
+</main><script src="progress.js"></script></body></html>
