@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Video Learning | Pro Learning</title><link rel="stylesheet" href="style.css">
+<style>
+.vmain{max-width:1100px;margin:auto;padding:28px 5vw 110px}.vpanel{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:clamp(16px,3vw,24px);margin:18px 0}.vpanel h2{color:var(--gold);margin:0 0 10px}.vplayer{width:100%;aspect-ratio:16/9;background:#080611;border-radius:15px;overflow:hidden;border:1px solid var(--line)}.vplayer iframe,.vplayer video{width:100%;height:100%;display:block;border:0}.vgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.vgrid label{margin:4px 0}.vgrid .wide{grid-column:1/-1}.vlist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.vitem{padding:14px;border:1px solid var(--line);border-radius:14px;background:#ffffff06}.vitem h3{margin:0 0 5px}.vitem p,.vnote{color:var(--muted);font-size:.88rem}.vmeta{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.vstatus{color:var(--gold);min-height:1.4em}.vstatus.error{color:var(--bad)}.vstatus.success{color:var(--good)}@media(max-width:650px){.vmain{padding:24px 18px 110px}.vgrid,.vlist{grid-template-columns:1fr}}
+</style></head>
+<body>
+<header class="topbar"><a class="brand brand-link" href="pro.html"><span class="brand-mark">✦</span> PRO LEARNING</a><a class="btn btn-ghost" href="pro.html">Back to dashboard</a></header>
+<main class="vmain">
+<div class="eyebrow">ECZ GRADE 10–12</div><h1>Video Learning</h1><p class="muted">Watch lessons and share learning videos with registered students.</p>
+<section class="vpanel"><h2>✨ Random Lesson Videos</h2><p class="vnote">Only one featured lesson at a time. It changes automatically every 30 seconds.</p>
+<div id="featured-player" class="vplayer"><div style="height:100%;display:grid;place-items:center;color:#bdb1d1">Loading lessons…</div></div>
+<div class="vmeta"><div><h3 id="featured-title">Finding a lesson…</h3><p id="featured-topic" class="muted">Please wait</p></div><span id="featured-source" class="vnote">Random lesson</span></div></section>
+<section class="vpanel"><h2>⬆ Share a Learning Video</h2><p class="vnote">Registered students can submit a YouTube link or upload a video. Published immediately without admin approval.</p>
+<form id="video-upload-form"><div class="vgrid">
+<label>Video title<input id="video-title" maxlength="120" required placeholder="e.g. Human Nervous System"></label>
+<label>Subject<select id="video-subject" required><option value="">Choose subject</option><option>Mathematics</option><option>English Language</option><option>Biology</option><option>Physics</option><option>Chemistry</option><option>Computer Studies</option><option>Civic Education</option><option>Additional Mathematics</option><option>Other</option></select></label>
+<label>Topic<input id="video-topic" maxlength="120" required placeholder="e.g. Homeostasis"></label>
+<label>YouTube URL (optional)<input id="youtube-url" type="url" placeholder="https://youtube.com/watch?v=..."></label>
+<label class="wide">Or select a video file<input id="video-file" type="file" accept="video/mp4,video/webm,video/ogg,video/quicktime"></label>
+</div><p class="vnote">Select either a YouTube URL or file. File size limit in this starter is 100 MB.</p><button class="btn btn-gold" id="submit-video" type="submit">Share video</button><p id="upload-status" class="vstatus" role="status"></p></form></section>
+<section class="vpanel"><h2>📚 Video Library</h2><label>Filter by subject<select id="library-filter"><option value="">All subjects</option><option>Mathematics</option><option>English Language</option><option>Biology</option><option>Physics</option><option>Chemistry</option><option>Computer Studies</option><option>Civic Education</option><option>Additional Mathematics</option><option>Other</option></select></label>
+<div id="video-library" class="vlist"><p class="muted">Loading library…</p></div><p id="library-status" class="vnote"></p></section></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase.js"></script><script src="video-learning.js"></script><script src="floating-nav.js"></script>
+</body></html>
