@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Study Station Pro | Admin Management</title>
+<style>
+:root{--bg:#0b1020;--panel:#121a2d;--line:#283650;--text:#edf2ff;--muted:#9eacc8;--gold:#f3c969;--purple:#8878ff;--green:#45d6a2;--red:#ff7185}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui,Arial,sans-serif}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 20px;background:#0d1426;border-bottom:1px solid var(--line)}
+.brand{font-weight:800}.brand span{color:var(--gold)}.tag{border:1px solid #66552e;color:var(--gold);border-radius:99px;padding:6px 10px;font-size:12px}
+main{max-width:1050px;margin:auto;padding:22px}.top{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+h1{font-size:25px;margin:0 0 8px}p{color:var(--muted);line-height:1.5;margin:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:17px;margin:18px 0}
+h2{font-size:18px;margin:0 0 12px}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
+input,select{width:100%;background:#0c1425;border:1px solid #33435f;border-radius:10px;padding:12px;color:var(--text);font:inherit}
+button{border:0;border-radius:10px;padding:10px 13px;font:700 14px system-ui;cursor:pointer;background:var(--purple);color:white}
+button.secondary{background:#202c45;border:1px solid var(--line)}button.danger{background:#883248}button.good{background:#146c51}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.form-actions{display:flex;align-items:end}
+#message{padding:12px;border-radius:10px;background:#172239;margin-top:12px;color:var(--muted);display:none}
+.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:680px}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);font-size:13px}th{color:var(--muted);font-weight:700}
+.status{display:inline-block;border-radius:99px;padding:4px 8px;font-size:12px}.active{background:#123d32;color:var(--green)}.inactive{background:#42212c;color:var(--red)}
+.empty{padding:18px;text-align:center;color:var(--muted)}.footnote{font-size:12px;margin-top:10px}
+@media(max-width:600px){main{padding:14px}.formgrid{grid-template-columns:1fr}header{padding:12px}}
+</style>
+</head>
+<body>
+<header><div class="brand">My Study Station <span>PRO</span></div><div class="actions"><span class="tag">SUPER ADMIN</span><button class="secondary" id="backBtn">Workspace</button><button class="secondary" id="signOut">Sign out</button></div></header>
+<main>
+<div class="top"><div><h1>Admin Management</h1><p>Appoint and manage School Administrators and Community Moderators.</p></div><button class="secondary" id="refresh">Refresh list</button></div>
+<div class="card">
+<h2>Appoint an administrator</h2>
+<p>Enter the target user's Supabase Auth user UUID. Do not use their password.</p>
+<form id="appointForm">
+<div class="formgrid" style="margin-top:14px">
+<div><label for="userId">User UUID</label><input id="userId" name="userId" placeholder="Paste user UUID" required></div>
+<div><label for="role">Role</label><select id="role" name="role"><option value="school_admin">School Administrator</option><option value="community_moderator">Community Moderator</option></select></div>
+<div class="form-actions"><button type="submit" id="appointBtn">Appoint administrator</button></div>
+</div>
+</form>
+<div id="message" role="status"></div>
+<p class="footnote">The database's Row Level Security is expected to enforce Super Admin-only permissions. The browser does not contain a service-role key.</p>
+</div>
+<div class="card">
+<h2>Current administrator roles</h2>
+<div class="tablewrap"><table><thead><tr><th>User UUID</th><th>Role</th><th>Status</th><th>Appointed</th><th>Actions</th></tr></thead><tbody id="rows"><tr><td colspan="5" class="empty">Loading roles…</td></tr></tbody></table></div>
+</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script>
+(async function(){
+ const message=document.getElementById('message'), rows=document.getElementById('rows'), form=document.getElementById('appointForm');
+ function say(text, bad=false){message.style.display='block';message.textContent=text;message.style.color=bad?'#ff9bab':'#b8c7e5';}
+ function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+ if(!window.supabaseClient){say('Supabase client was not found. Check the supabase.js client variable.',true);rows.innerHTML='<tr><td colspan="5" class="empty">Setup error.</td></tr>';return;}
+ const {data:{session},error:sessionErr}=await supabaseClient.auth.getSession();
+ if(sessionErr||!session){location.replace('admin-login.html');return;}
+ const {data:superAllowed,error:roleErr}=await supabaseClient.rpc('is_super_admin');
+ if(roleErr||superAllowed!==true){say('Access denied. This page is restricted to the active Super Administrator.',true);form.querySelector('button').disabled=true;rows.innerHTML='<tr><td colspan="5" class="empty">Not authorized.</td></tr>';return;}
+ async function loadRoles(){
+   rows.innerHTML='<tr><td colspan="5" class="empty">Loading roles…</td></tr>';
+   const {data,error}=await supabaseClient.from('admin_roles').select('id,user_id,role,status,appointed_by,appointed_at').order('appointed_at',{ascending:false});
+   if(error){rows.innerHTML='<tr><td colspan="5" class="empty">Could not load roles: '+esc(error.message)+'</td></tr>';return;}
+   if(!data||!data.length){rows.innerHTML='<tr><td colspan="5" class="empty">No admin role records found.</td></tr>';return;}
+   rows.innerHTML=data.map(r=>`<tr>
+    <td><code>${esc(r.user_id)}</code></td><td>${esc(roleName(r.role))}</td>
+    <td><span class="status ${r.status==='active'?'active':'inactive'}">${esc(r.status)}</span></td>
+    <td>${esc(r.appointed_at?new Date(r.appointed_at).toLocaleString():'—')}</td>
+    <td><div class="actions">${r.role==='super_admin'?'<span class="footnote">Protected owner role</span>':`<button class="secondary" data-toggle="${esc(r.id)}" data-status="${esc(r.status)}">${r.status==='active'?'Deactivate':'Activate'}</button><button class="danger" data-remove="${esc(r.id)}">Remove</button>`}</div></td>
+   </tr>`).join('');
+   rows.querySelectorAll('[data-toggle]').forEach(btn=>btn.addEventListener('click',()=>toggleRole(btn.dataset.toggle,btn.dataset.status)));
+   rows.querySelectorAll('[data-remove]').forEach(btn=>btn.addEventListener('click',()=>removeRole(btn.dataset.remove)));
+ }
+ function roleName(role){return role==='super_admin'?'Super Administrator':role==='school_admin'?'School Administrator':role==='community_moderator'?'Community Moderator':role;}
+ async function bestEffortAudit(action,targetId,details){
+   // Audit insertion is best-effort; RLS must allow only legitimate authenticated admin actions.
+   const {data:{user}}=await supabaseClient.auth.getUser();
+   await supabaseClient.from('admin_audit_logs').insert({admin_user_id:user?.id,action,target_type:'admin_role',target_id:targetId,details});
+ }
+ form.addEventListener('submit',async e=>{
+   e.preventDefault();const userId=document.getElementById('userId').value.trim(),role=document.getElementById('role').value;
+   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)){say('Please enter a valid UUID.',true);return;}
+   const btn=document.getElementById('appointBtn');btn.disabled=true;btn.textContent='Appointing…';
+   try{
+    const {data:{user}}=await supabaseClient.auth.getUser();
+    const {error}=await supabaseClient.from('admin_roles').insert({user_id:userId,role,status:'active',appointed_by:user.id});
+    if(error)throw error;
+    await bestEffortAudit('appoint_admin_role',null,{user_id:userId,role});
+    say('Administrator appointed successfully.');form.reset();await loadRoles();
+   }catch(err){say('Appointment failed: '+(err.message||'Unknown error'),true);}
+   finally{btn.disabled=false;btn.textContent='Appoint administrator';}
+ });
+ async function toggleRole(id,current){
+   const next=current==='active'?'inactive':'active';
+   if(!confirm('Change this administrator status to '+next+'?'))return;
+   const {error}=await supabaseClient.from('admin_roles').update({status:next}).eq('id',id);
+   if(error){say('Status update failed: '+error.message,true);return;}
+   await bestEffortAudit('change_admin_status',id,{status:next});say('Administrator status updated.');await loadRoles();
+ }
+ async function removeRole(id){
+   if(!confirm('Remove this administrator role? This does not delete the user account.'))return;
+   const {error}=await supabaseClient.from('admin_roles').delete().eq('id',id);
+   if(error){say('Removal failed: '+error.message,true);return;}
+   await bestEffortAudit('remove_admin_role',id,{});say('Administrator role removed.');await loadRoles();
+ }
+ document.getElementById('refresh').onclick=loadRoles;
+ document.getElementById('backBtn').onclick=()=>location.href='super-admin.html';
+ document.getElementById('signOut').onclick=async()=>{await supabaseClient.auth.signOut();location.replace('admin-login.html');};
+ await loadRoles();
+})();
+</script>
+</body>
+</html>
