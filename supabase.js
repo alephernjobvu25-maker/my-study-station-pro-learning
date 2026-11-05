@@ -1,9 +1,16 @@
-/* File: supabase.js — Fill in only the Supabase Project URL and anon/public key. */
-const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_PUBLIC_KEY";
-if (!window.supabase || SUPABASE_URL.startsWith("YOUR_") || SUPABASE_ANON_KEY.startsWith("YOUR_")) {
-  console.warn("Pro Learning: Supabase configuration is not filled in yet.");
-}
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-});
+// Supabase browser client for My Study Station Pro Learning.
+// This uses the project's public publishable key. Keep RLS enabled on all tables.
+(function () {
+  const SUPABASE_URL = 'https://oedgmybbbhbqerxbmeek.supabase.co';
+  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_TlOH5MnKEdgS1b3fi3NqVg_4MW08jEE';
+
+  if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+    console.error('Supabase JS library failed to load.');
+    return;
+  }
+
+  window.supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+})();
