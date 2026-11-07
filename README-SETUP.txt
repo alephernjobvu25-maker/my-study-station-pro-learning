@@ -1,23 +1,22 @@
-MY STUDY STATION PRO LEARNING — STUDENT LOGIN + MEMBERSHIP GATE PATCH
+MY STUDY STATION — SUPABASE CONFIG FIX
 
-Included:
-- auth.js: student login checks Supabase credentials then checks latest membership. Active users route to pro.html; expired/inactive users route to subscription-expired.html.
-- dashboard.js: validates session and subscription on direct dashboard entry, preventing access when the membership is inactive/expired.
-- subscription-expired.html: friendly notice for inactive subscriptions.
-- student-membership-read-policies.sql: read-only RLS policies so each student can select only their own membership/profile records.
+This ZIP contains a corrected supabase.js configuration file for the public repository.
 
-ASSUMPTIONS inferred from the repository's current dashboard.js:
-- memberships columns: user_id, status, expires_at, created_at
-- profiles id is equal to auth.uid()
-- a valid membership has status='active' and expires_at in the future
-- the project UI shows K25/month
+1. Open your GitHub repository:
+   https://github.com/alephernjobvu25-maker/my-study-station-pro-learning
+2. Open supabase.js and tap Edit (pencil).
+3. Replace the entire file with the supabase.js from this ZIP.
+4. Commit the changes.
+5. Wait for Netlify to redeploy.
+6. Test:
+   https://my-studystation.netlify.app/register.html
+   https://my-studystation.netlify.app/login.html
 
-UPLOAD:
-1. Extract this ZIP on your phone.
-2. In GitHub, upload/replace auth.js and dashboard.js in repository root.
-3. Upload subscription-expired.html into repository root.
-4. Commit the changes and wait for Netlify deployment.
-5. Review existing Supabase RLS policies; if these student SELECT policies are not already in place, review and run student-membership-read-policies.sql in Supabase SQL Editor.
-6. Test with a student whose membership row is status active and expires_at is a future timestamp.
+Your login.html and register.html already load scripts in this order:
+Supabase JS CDN -> supabase.js -> auth.js
 
-This patch does not create payment processing or auto-renewal. An authorized backend/admin must set/update membership records after renewal. No Supabase secret/service_role key is included.
+IMPORTANT SECURITY:
+- The key included is a publishable/browser key, not a secret key.
+- If you previously exposed a Supabase secret/service-role key publicly, rotate/revoke it in Supabase.
+- Do not add secret/service-role keys to this site or GitHub.
+- This config fix addresses client initialization; membership table/schema and RLS may still need checking if another error appears.
