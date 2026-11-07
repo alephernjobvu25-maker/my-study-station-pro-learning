@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Subscription required | My Study Station Pro Learning</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="auth-shell">
+    <a class="brand brand-link" href="index.html"><span class="brand-mark">✦</span> MY STUDY STATION <small>PRO LEARNING</small></a>
+    <section class="auth-card">
+      <div class="eyebrow">STUDENT MEMBERSHIP</div>
+      <h1>Your subscription is not active.</h1>
+      <p class="muted">Your account is signed in, but the system could not find an active K25 monthly membership. Please contact the platform administrator for renewal or help.</p>
+      <p id="membership-detail" class="message" role="status">Access to the student work area is paused until your membership is active.</p>
+      <button id="sign-out" class="btn btn-gold full" type="button">Sign out</button>
+      <p class="auth-foot"><a href="index.html">Back to main website</a></p>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script>
+    (async function () {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) { window.location.replace("login.html"); return; }
+      const { data, error } = await supabaseClient.from("memberships")
+        .select("status,expires_at,created_at").eq("user_id", user.id)
+        .order("created_at", { ascending: false }).limit(1).maybeSingle();
+      const detail = document.getElementById("membership-detail");
+      if (error) detail.textContent = "Membership check could not be completed. Please contact the administrator.";
+      else if (!data) detail.textContent = "No membership record was found for this account. Please contact the administrator.";
+      else if (data.expires_at) detail.textContent = "Membership status: " + (data.status || "unknown") + ". Expiry date: " + new Date(data.expires_at).toLocaleDateString() + ". Please contact the administrator for renewal.";
+      else detail.textContent = "Membership status: " + (data.status || "unknown") + ". Please contact the administrator for renewal.";
+      document.getElementById("sign-out").addEventListener("click", async () => {
+        await supabaseClient.auth.signOut();
+        window.location.replace("login.html");
+      });
+    })();
+  </script>
+</body>
+</html>

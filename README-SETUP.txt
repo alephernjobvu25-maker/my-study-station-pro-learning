@@ -1,26 +1,23 @@
-MY STUDY STATION PRO LEARNING — SUPABASE + LOGO CONFIGURATION
+MY STUDY STATION PRO LEARNING — STUDENT LOGIN + MEMBERSHIP GATE PATCH
 
-Package contents:
-- admin-login.html
-- super-admin.html
-- mystudystation-pro-learning-logo.png
-- supabase.js (configured with your Project URL and public publishable key)
+Included:
+- auth.js: student login checks Supabase credentials then checks latest membership. Active users route to pro.html; expired/inactive users route to subscription-expired.html.
+- dashboard.js: validates session and subscription on direct dashboard entry, preventing access when the membership is inactive/expired.
+- subscription-expired.html: friendly notice for inactive subscriptions.
+- student-membership-read-policies.sql: read-only RLS policies so each student can select only their own membership/profile records.
 
-UPLOAD STEPS (GitHub via phone):
-1. Open your repository:
-   https://github.com/alephernjobvu25-maker/my-study-station-pro-learning
-2. Upload all four files into the repository root (the same level as index.html).
-3. If GitHub asks whether to replace existing admin-login.html, super-admin.html,
-   or supabase.js, replace them with the package versions.
-4. Commit the changes and wait for Netlify to deploy.
-5. Open the separate administrator login page:
-   https://my-studystation.netlify.app/admin-login.html
-6. Refresh the page. If the logo is still cached, use the browser menu and reload,
-   or open the site in a private tab.
+ASSUMPTIONS inferred from the repository's current dashboard.js:
+- memberships columns: user_id, status, expires_at, created_at
+- profiles id is equal to auth.uid()
+- a valid membership has status='active' and expires_at in the future
+- the project UI shows K25/month
 
-SECURITY:
-- The sb_publishable key is meant for browser use. Supabase Row Level Security (RLS)
-  must remain enabled and correctly configured.
-- Never put a Supabase secret key or service_role key in website files.
-- Admin access is still checked using the existing is_super_admin / is_platform_admin RPCs.
-- This package does not change database policies or assign administrator roles.
+UPLOAD:
+1. Extract this ZIP on your phone.
+2. In GitHub, upload/replace auth.js and dashboard.js in repository root.
+3. Upload subscription-expired.html into repository root.
+4. Commit the changes and wait for Netlify deployment.
+5. Review existing Supabase RLS policies; if these student SELECT policies are not already in place, review and run student-membership-read-policies.sql in Supabase SQL Editor.
+6. Test with a student whose membership row is status active and expires_at is a future timestamp.
+
+This patch does not create payment processing or auto-renewal. An authorized backend/admin must set/update membership records after renewal. No Supabase secret/service_role key is included.
