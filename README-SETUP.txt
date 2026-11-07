@@ -1,22 +1,16 @@
-MY STUDY STATION — SUPABASE CONFIG FIX
+# My Study Station Pro Learning — Auth Focus Package
 
-This ZIP contains a corrected supabase.js configuration file for the public repository.
+Included: student login, student registration, Supabase browser client configuration (public publishable key only), separate administrator login, Super Admin gated workspace, admin role management files, membership-not-active page, and logo.
 
-1. Open your GitHub repository:
-   https://github.com/alephernjobvu25-maker/my-study-station-pro-learning
-2. Open supabase.js and tap Edit (pencil).
-3. Replace the entire file with the supabase.js from this ZIP.
-4. Commit the changes.
-5. Wait for Netlify to redeploy.
-6. Test:
-   https://my-studystation.netlify.app/register.html
-   https://my-studystation.netlify.app/login.html
+## Deployment
+Upload these files into the same Netlify publish directory (site root), preserving filenames. The CDN script must load before `supabase.js`; the pages already do this.
 
-Your login.html and register.html already load scripts in this order:
-Supabase JS CDN -> supabase.js -> auth.js
+## Supabase checks required
+- Auth users should be able to sign up and sign in; configure email confirmation and Site URL / redirect URLs for your Netlify domain.
+- `profiles`, `schools`, and `memberships` tables and their RLS policies must exist and allow a student to read their own records.
+- The RPC functions `is_super_admin()` and `is_platform_admin()` must exist and return boolean values, with security and RLS enforced server-side.
+- For an active student membership, `memberships.status` must be `active` and `expires_at` a future timestamp. This client-side check is only a page gate; secure resource access must also be protected by RLS.
+- Student signup's `display_name` and optional `school_id` are passed into auth metadata. A database trigger/profile policy should populate `profiles` if your dashboard depends on that table.
 
-IMPORTANT SECURITY:
-- The key included is a publishable/browser key, not a secret key.
-- If you previously exposed a Supabase secret/service-role key publicly, rotate/revoke it in Supabase.
-- Do not add secret/service-role keys to this site or GitHub.
-- This config fix addresses client initialization; membership table/schema and RLS may still need checking if another error appears.
+## Important
+Never place a Supabase secret/service-role key in browser files. The publishable key included in `supabase.js` is intended for browser use. Do not use this client-only gate as the only protection for privileged data.
