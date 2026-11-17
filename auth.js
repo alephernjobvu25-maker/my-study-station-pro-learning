@@ -111,9 +111,14 @@ if (loginForm) loginForm.addEventListener("submit", async (event) => {
       return;
     }
     showMessage("Checking your membership…");
+    const { data: superAdmin, error: roleError } = await supabaseClient.rpc("is_super_admin");
+    if (!roleError && superAdmin === true) {
+      window.location.replace("pro.html");
+      return;
+    }
     const membership = await checkMembership(data.user.id);
     if (membership.active) window.location.replace("pro.html");
-    else window.location.replace("subscription-expired.html");
+    else window.location.replace("basic.html");
   } catch (error) {
     showMessage(error.message || "Login failed. Please try again.", true);
   } finally {

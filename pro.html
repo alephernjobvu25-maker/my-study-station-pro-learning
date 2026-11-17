@@ -1,108 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Student dashboard | Pro Learning
-    </title>
-    <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-      <header class="topbar">
-        <a class="brand brand-link" href="index.html">
-          <span class="brand-mark">
-            ✦
-          </span> PRO LEARNING
-        </a>
-          <button id="logout" class="btn btn-ghost">Log out
-          </button>
-      </header>
-          <main class="dashboard">
-            <div class="eyebrow">STUDENT SPACE
-            </div>
-            <h1>Welcome, 
-            <span id="student-name">Learner</span>.
-            </h1>
-            <p class="muted">Your learning journey, organized in one place.
-            </p>
-            <section class="stats">
-              <img src="images (2).jpeg" alt="welcome"
-              class="imagepanel">
-              <article class="panel">
-                <small>Student number
-                </small>
-                <h2 id="student-number">Pending…</h2>
-                </article>
-                <article class="panel">
-                  
-                  <small>Membership
-                  </small>
-                  <h2 id="membership-status">Checking…
-                  </h2>
-                  <p class="muted">Membership fee: K25 / month
-                  </p>
-                  </article>
-                  <article class="panel">
-                    <small>School
-                    </small>
-                    <h2 id="school-name">Not selected
-                    </h2>
-                  </article>
-            </section>
-                    <section class="panel">
-                      <h2>Your learning tools
-                      </h2>
-                      <div class="tool-grid">
-                        <a class="tool" href="notes.html">
-                          <b>Study notes
-                          </b>
-                          <small>Subject learning materials
-                          </small>
-                          </a>
-                          <a class="tool" href="papers.html">
-                            <b>Past papers
-                            </b>
-                            <small>Practice for ECZ exams
-                            </small>
-                            </a>
-                            <a class="tool" href="quizzes.html">
-                              <b>Quizzes
-                              </b>
-                              <small>Test your understanding</small>
-                              </a>
-                              <a class="tool" href="#timetable">
-                                <b>Study timetable
-                                </b>
-                                <small>Plan your study sessions
-                                </small>
-                                </a><a class="tool" href="#progress">
-                                  <b>Progress
-                                  </b><small>Review your achievements
-                                  </small>
-                                  </a>
-                                  <a class="tool" href="#groups">
-                                    <b>Study groups
-                                    </b>
-                                    <small>Learn with others
-                                    </small>
-                                    </a>
-                                    </div>
-                                    <p id="dashboard-message" class="message" role="status">Study Notes is now available. Notes are saved on this device for now.
-                                    </p>
-                                    </section>
-          </main>
-                                    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-                                      
-                                    </script>
-                                    <script src="supabase.js">
-                                      
-                                    </script>
-                                    <script src=
-                                    "dashboard.js">
-                                      
-                                    </scripture><script src="floating-nav.js">
-                                   </script>
-                                    <script src="floating-nav.js">
-                   </script>
-  </body>
-  </html>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b32"><title>Pro Learning | My Study Station</title><link rel="stylesheet" href="learning.css"><style>:root{--accent:#b58a20;--accent-2:#d2aa45;--gold:#e5bd55}:root[data-theme="dark"]{--accent:#f0c75d;--accent-2:#ffdb7c;--gold:#f0c75d}.pro-hero{background:linear-gradient(125deg,#101d39,#243b66 58%,#9b7421);color:#fff;border-radius:22px;padding:22px}.pro-hero p{color:#e5eaf4}.pro-hero .eyebrow{color:#ffe49b}</style><script src="theme.js"></script></head>
+<body data-area="pro">
+<header class="app-header"><div class="header-inner"><a class="brand" href="pro.html"><img src="mystudystation-pro-learning-logo.png" alt=""><span>MY STUDY STATION<small>PRO LEARNING</small></span></a><div class="header-actions"><a class="icon-btn" href="progress.html#updates" aria-label="Progress notifications">♢</a><a class="avatar" href="profile.html?area=pro" aria-label="My profile" id="student-avatar">L</a><button class="btn btn-soft" id="logout" type="button">Log out</button></div></div></header>
+<main class="page"><div id="home-status" class="status" role="status">Checking your Pro membership…</div><div id="protected-content" hidden>
+<section class="pro-hero"><div class="eyebrow">YOUR PROFESSIONAL LEARNING SPACE</div><h1 class="page-title">Welcome back, <span id="student-name">Learner</span>!</h1><p>Keep building your knowledge with focused lessons, resources and progress tools.</p><div class="grid grid-3" style="margin-top:16px"><div class="stat-card"><small>Membership</small><strong id="membership-status">Active</strong></div><div class="stat-card"><small>Days remaining</small><strong id="membership-days">—</strong></div><div class="stat-card"><small>Expires on</small><strong id="membership-expiry">—</strong></div></div></section>
+<section class="grid grid-2" style="margin-top:16px"><div class="stat-card"><small>Student number</small><strong id="student-number">Pending confirmation</strong></div><div class="stat-card"><small>School</small><strong id="school-name">Not selected</strong></div></section>
+<section style="margin-top:22px"><div class="section-head"><h2>Continue learning</h2><span class="membership-pill">✦ Pro member</span><a class="btn btn-soft" id="switch-basic-preview" href="basic.html" hidden>Preview Basic</a></div><div class="grid grid-3"><a class="tile" href="notes.html"><span class="tile-icon">▤</span><b>Study Notes</b><small>Explore subject notes</small></a><a class="tile" href="papers.html"><span class="tile-icon">▧</span><b>Past Papers</b><small>Prepare for examinations</small></a><a class="tile" href="quizzes.html"><span class="tile-icon">✦</span><b>Quizzes & Tests</b><small>Check your understanding</small></a><a class="tile" href="timetable.html"><span class="tile-icon">◷</span><b>Study Timetable</b><small>Plan your sessions</small></a><a class="tile" href="pro-reels.html"><span class="tile-icon">▶</span><b>Learning Reels</b><small>Standard and advanced videos</small></a><a class="tile" href="progress.html"><span class="tile-icon">▥</span><b>My Progress</b><small>Review progress and updates</small></a><a class="tile" href="chat.html"><span class="tile-icon">✉</span><b>Study Groups</b><small>Pro Chat and group learning</small></a></div></section>
+<section class="panel" style="margin-top:22px"><div class="section-head"><h2>Your learning overview</h2><a href="progress.html">Open Progress</a></div><p class="muted">Your detailed learning statistics, achievements, goals and notifications are available on the Progress page.</p><div class="grid grid-2"><div class="notice"><b>Progress updates</b><p>Review completed sessions and quiz results.</p></div><div class="notice"><b>Important notifications</b><p>See study reminders, achievements and membership alerts.</p></div></div></section>
+<p id="basic-message" class="status" role="status"></p></div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase.js"></script><script src="app-core.js"></script><script src="home.js"></script><script src="floating-nav.js"></script>
+</body></html>

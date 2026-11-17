@@ -1,16 +1,35 @@
-# My Study Station Pro Learning — Auth Focus Package
+MY STUDY STATION — FIRST LEARNING UI IMPLEMENTATION
 
-Included: student login, student registration, Supabase browser client configuration (public publishable key only), separate administrator login, Super Admin gated workspace, admin role management files, membership-not-active page, and logo.
+This is a separate working copy based on the project ZIP supplied in chat. Keep the original ZIP unchanged as your backup.
 
-## Deployment
-Upload these files into the same Netlify publish directory (site root), preserving filenames. The CDN script must load before `supabase.js`; the pages already do this.
+MAIN NEW PAGES:
+- basic.html                 Basic Learning Home
+- pro.html                   Pro Learning Home
+- basic-notifications.html   Basic Notifications
+- progress.html              Pro Progress + Notifications
+- basic-reels.html           Basic Reels
+- pro-reels.html             Pro Reels
+- settings.html              Shared Basic/Pro Settings (appearance, privacy, notification preferences, password change)
 
-## Supabase checks required
-- Auth users should be able to sign up and sign in; configure email confirmation and Site URL / redirect URLs for your Netlify domain.
-- `profiles`, `schools`, and `memberships` tables and their RLS policies must exist and allow a student to read their own records.
-- The RPC functions `is_super_admin()` and `is_platform_admin()` must exist and return boolean values, with security and RLS enforced server-side.
-- For an active student membership, `memberships.status` must be `active` and `expires_at` a future timestamp. This client-side check is only a page gate; secure resource access must also be protected by RLS.
-- Student signup's `display_name` and optional `school_id` are passed into auth metadata. A database trigger/profile policy should populate `profiles` if your dashboard depends on that table.
+SUPPORTING PAGES:
+- profile.html               Private student profile view (read-only for now)
+- chat.html                  Guarded Pro Chat placeholder
+- video-moderation.html      Admin moderation for Reels, comments and reports
 
-## Important
-Never place a Supabase secret/service-role key in browser files. The publishable key included in `supabase.js` is intended for browser use. Do not use this client-only gate as the only protection for privileged data.
+IMPORTANT:
+1. Read IMPLEMENTATION-NOTES.md before installing.
+2. Review mss-learning-setup.sql. It assumes the existing memberships table and is_platform_admin() function.
+3. Run mss-learning-setup.sql in Supabase only after reviewing it.
+4. Do NOT run supabase-video-learning.sql. It is deprecated and replaced by mss-learning-setup.sql.
+5. The Supabase SQL has not been executed and this package has not been deployed or tested against the live project.
+6. Never add a Supabase service-role or secret key to browser code.
+7. Keep the original ZIP as a backup and test with separate Basic, active Pro, expired Pro, and admin accounts before replacing the live site.
+
+KNOWN NEXT TASKS:
+- Add the Basic notes, quiz, achievement and resource modules.
+- Build the real Pro Chat system with safety/moderation controls.
+- Build the public profile endpoint that exposes only opted-in permitted details.
+- Add profile editing and photo upload.
+- Connect notification creation to the admin dashboard.
+- Move progress data from browser storage into RLS-protected Supabase tables.
+- Connect subscription payments and renewal workflows.

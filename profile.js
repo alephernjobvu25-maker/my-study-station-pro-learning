@@ -1,0 +1,5 @@
+(() => {
+  'use strict';
+  const $=id=>document.getElementById(id);const area=new URLSearchParams(location.search).get('area')==='pro'?'pro':'basic';document.body.dataset.area=area;
+  document.addEventListener('DOMContentLoaded',async()=>{const result=await MSS.requireArea(area);if(!result)return;const name=MSS.displayName(result.profile,result.user);$('profile-name').textContent=name;$('profile-avatar').textContent=(name[0]||'L').toUpperCase();$('profile-student-number').textContent=result.profile.student_number||'Pending confirmation';$('profile-email').textContent=result.user.email||'Not available';$('profile-area').textContent=area==='pro'?'Pro Learning':'Basic Learning';$('profile-settings').href=`settings.html?area=${area}`;$('profile-back').href=area==='pro'?'pro.html':'basic.html';if(result.profile.school_id){const {data}=await MSS.client().from('schools').select('school_name').eq('id',result.profile.school_id).maybeSingle();$('profile-school').textContent=data?.school_name||'Selected school';}else $('profile-school').textContent='Not selected';$('profile-content').hidden=false;$('profile-status').textContent='';});
+})();

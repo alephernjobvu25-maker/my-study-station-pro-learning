@@ -27,7 +27,7 @@
   const expiryMs = membership?.expires_at ? Date.parse(membership.expires_at) : NaN;
   const active = status === "active" && Number.isFinite(expiryMs) && expiryMs > Date.now();
   if (!active) {
-    window.location.replace("subscription-expired.html");
+    window.location.replace("basic.html");
     return;
   }
 

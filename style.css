@@ -350,3 +350,9 @@ body{
 }
   
 }
+
+/* Device theme baseline for legacy pages. New learning pages use learning.css. */
+:root[data-theme="light"]{--ink:#14233d;--muted:#62718a;--purple:#f4f8ff;--purple2:#e8f1ff;--gold:#a9790c;--gold2:#c99b35;--panel:#fff;--line:#d9e4f3;--good:#16794b;--bad:#b42335}
+:root[data-theme="dark"]{--ink:#f7f2ff;--muted:#bdb1d1;--purple:#170d2b;--purple2:#2b1747;--gold:#e8c66b;--gold2:#c99b35;--panel:rgba(42,25,66,.78);--line:rgba(232,198,107,.22);--good:#8de0b0;--bad:#ff9d9d}
+:root[data-theme="light"] body{background:linear-gradient(135deg,#f5f8ff,#eaf1fc 58%,#f8f5ec)!important;color:var(--ink)}
+:root[data-theme="dark"] body{background:radial-gradient(ellipse at 75% 15%,#3a215a 0%,transparent 36%),linear-gradient(135deg,#12091f,#211138 58%,#160d29)!important;color:var(--ink)}
