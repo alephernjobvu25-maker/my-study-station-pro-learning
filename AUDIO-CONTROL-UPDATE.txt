@@ -1,0 +1,18 @@
+MY STUDY STATION — REELS AUDIO CONTROL UPDATE
+
+This package is based on the previous working Volume Control Update ZIP.
+
+Audio behaviour:
+- Each Reel starts muted.
+- The centre control shows Play while a Reel is muted, even while muted autoplay is running.
+- Tap the centre Play control to enable sound for the current Reel.
+- Tap the centre Pause control to pause and mute the current Reel.
+- When a different Reel becomes active, other Reels are paused and muted.
+- The next Reel starts muted and waits for the student to tap the centre Play control for sound.
+- The automatic 3-second sound change is not used.
+
+Existing Supabase configuration, private student-reels Storage bucket, signed media URLs,
+student_reels table queries, moderation filtering, and access controls are retained.
+
+Upload the files from this ZIP using the same site-root replacement procedure as the previous
+Reels update. Do not change Supabase Storage privacy or database policies for this update.

@@ -1,12 +1,53 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b32"><title>Pro Learning | My Study Station</title><link rel="stylesheet" href="learning.css"><style>:root{--accent:#b58a20;--accent-2:#d2aa45;--gold:#e5bd55}:root[data-theme="dark"]{--accent:#f0c75d;--accent-2:#ffdb7c;--gold:#f0c75d}.pro-hero{background:linear-gradient(125deg,#101d39,#243b66 58%,#9b7421);color:#fff;border-radius:22px;padding:22px}.pro-hero p{color:#e5eaf4}.pro-hero .eyebrow{color:#ffe49b}</style><script src="theme.js"></script></head>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#09152c"><title>Pro Learning | My Study Station</title>
+<link rel="stylesheet" href="learning.css"><link rel="stylesheet" href="dashboard-design.css">
+<style>:root{--accent:#b58a20;--accent-2:#d2aa45;--gold:#e5bd55}:root[data-theme="dark"]{--accent:#f0c75d;--accent-2:#ffdb7c;--gold:#f0c75d}</style><script src="theme.js"></script>
+</head>
 <body data-area="pro">
-<header class="app-header"><div class="header-inner"><a class="brand" href="pro.html"><img src="mystudystation-pro-learning-logo.png" alt=""><span>MY STUDY STATION<small>PRO LEARNING</small></span></a><div class="header-actions"><a class="icon-btn" href="progress.html#updates" aria-label="Progress notifications">♢</a><a class="avatar" href="profile.html?area=pro" aria-label="My profile" id="student-avatar">L</a><button class="btn btn-soft" id="logout" type="button">Log out</button></div></div></header>
-<main class="page"><div id="home-status" class="status" role="status">Checking your Pro membership…</div><div id="protected-content" hidden>
-<section class="pro-hero"><div class="eyebrow">YOUR PROFESSIONAL LEARNING SPACE</div><h1 class="page-title">Welcome back, <span id="student-name">Learner</span>!</h1><p>Keep building your knowledge with focused lessons, resources and progress tools.</p><div class="grid grid-3" style="margin-top:16px"><div class="stat-card"><small>Membership</small><strong id="membership-status">Active</strong></div><div class="stat-card"><small>Days remaining</small><strong id="membership-days">—</strong></div><div class="stat-card"><small>Expires on</small><strong id="membership-expiry">—</strong></div></div></section>
-<section class="grid grid-2" style="margin-top:16px"><div class="stat-card"><small>Student number</small><strong id="student-number">Pending confirmation</strong></div><div class="stat-card"><small>School</small><strong id="school-name">Not selected</strong></div></section>
-<section style="margin-top:22px"><div class="section-head"><h2>Continue learning</h2><span class="membership-pill">✦ Pro member</span><a class="btn btn-soft" id="switch-basic-preview" href="basic.html" hidden>Preview Basic</a></div><div class="grid grid-3"><a class="tile" href="notes.html"><span class="tile-icon">▤</span><b>Study Notes</b><small>Explore subject notes</small></a><a class="tile" href="papers.html"><span class="tile-icon">▧</span><b>Past Papers</b><small>Prepare for examinations</small></a><a class="tile" href="quizzes.html"><span class="tile-icon">✦</span><b>Quizzes & Tests</b><small>Check your understanding</small></a><a class="tile" href="timetable.html"><span class="tile-icon">◷</span><b>Study Timetable</b><small>Plan your sessions</small></a><a class="tile" href="pro-reels.html"><span class="tile-icon">▶</span><b>Learning Reels</b><small>Standard and advanced videos</small></a><a class="tile" href="progress.html"><span class="tile-icon">▥</span><b>My Progress</b><small>Review progress and updates</small></a><a class="tile" href="chat.html"><span class="tile-icon">✉</span><b>Study Groups</b><small>Pro Chat and group learning</small></a></div></section>
-<section class="panel" style="margin-top:22px"><div class="section-head"><h2>Your learning overview</h2><a href="progress.html">Open Progress</a></div><p class="muted">Your detailed learning statistics, achievements, goals and notifications are available on the Progress page.</p><div class="grid grid-2"><div class="notice"><b>Progress updates</b><p>Review completed sessions and quiz results.</p></div><div class="notice"><b>Important notifications</b><p>See study reminders, achievements and membership alerts.</p></div></div></section>
-<p id="basic-message" class="status" role="status"></p></div></main>
+<header class="app-header"><div class="header-inner">
+<a class="brand" href="pro.html"><img src="mystudystation-pro-learning-logo.png" alt=""><span>MY STUDY STATION<small>PRO LEARNING</small></span></a>
+<div class="header-actions"><a class="icon-btn" href="progress.html#updates" aria-label="Progress notifications">♢</a><a class="avatar" href="profile.html?area=pro" aria-label="My profile" id="student-avatar">L</a><button class="btn btn-soft" id="logout" type="button">Log out</button></div>
+</div></header>
+<main class="page home-dashboard">
+<div id="home-status" class="status" role="status">Checking your Pro membership…</div>
+<div id="protected-content" hidden>
+<section class="home-welcome pro-home-welcome">
+  <div><div class="eyebrow">YOUR PREMIUM LEARNING SPACE</div><h1>Welcome back, <span id="student-name">Learner</span></h1><p>Explore, focus and make progress at your own pace.</p></div>
+  <a class="home-profile-link" href="profile.html?area=pro" aria-label="Open profile">↗</a>
+</section>
+<section class="pro-membership-bar">
+  <div class="pro-member-heading"><span class="pro-member-mark">✦</span><div><b id="membership-status">Active Pro membership</b><small>Student number: <span id="student-number">Pending confirmation</span></small></div></div>
+  <div class="pro-member-expiry"><small>Days remaining</small><strong id="membership-days">—</strong><small>Expires <span id="membership-expiry">—</span></small></div>
+</section>
+<section class="home-section pro-progress-section">
+  <div class="section-head"><div><div class="eyebrow">YOUR JOURNEY</div><h2>Learning progress</h2></div><a class="text-link" href="progress.html">View details →</a></div>
+  <div class="pro-progress-grid">
+    <div><strong id="home-quiz-count">0</strong><small>Quiz attempts</small></div>
+    <div><strong id="home-average-score">0%</strong><small>Average score</small></div>
+    <div><strong id="home-study-count">0</strong><small>Study sessions</small></div>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="home-average-fill"></div></div>
+</section>
+<section class="home-section home-reels-section">
+  <div class="section-head"><div><div class="eyebrow">A LITTLE INSPIRATION</div><h2>Learning Reels</h2><p class="section-subtitle">Three short videos to explore when you need a fresh idea.</p></div><a class="text-link" href="pro-reels.html">Explore all <span aria-hidden="true">→</span></a></div>
+  <div id="home-featured-reels" class="home-reel-grid" aria-live="polite"><div class="home-reel-placeholder">Finding featured learning videos…</div></div>
+</section>
+<section class="home-section">
+  <div class="section-head"><div><div class="eyebrow">YOUR STUDY TOOLKIT</div><h2>Explore your tools</h2></div></div>
+  <div class="home-tools-grid">
+    <a class="home-tool" href="notes.html"><span class="home-tool-icon">▤</span><span><b>Study Notes</b><small>Explore subject notes</small></span><span class="tool-arrow">→</span></a>
+    <a class="home-tool" href="papers.html"><span class="home-tool-icon">▧</span><span><b>Past Papers</b><small>Prepare for examinations</small></span><span class="tool-arrow">→</span></a>
+    <a class="home-tool" href="quizzes.html"><span class="home-tool-icon">✦</span><span><b>Quizzes</b><small>Check your understanding</small></span><span class="tool-arrow">→</span></a>
+    <a class="home-tool" href="timetable.html"><span class="home-tool-icon">◷</span><span><b>Study Timetable</b><small>Plan your sessions</small></span><span class="tool-arrow">→</span></a>
+    <a class="home-tool" href="video-learning.html"><span class="home-tool-icon">▶</span><span><b>Video Lessons</b><small>Explore lesson videos</small></span><span class="tool-arrow">→</span></a>
+    <a class="home-tool" href="chat.html"><span class="home-tool-icon">✉</span><span><b>Study Groups</b><small>Learn together</small></span><span class="tool-arrow">→</span></a>
+  </div>
+</section>
+<section class="home-update-strip"><div><div class="eyebrow">STAY CONNECTED</div><h2>Updates for your learning journey</h2><p>Find announcements, reminders and achievements in your Progress area.</p></div><a class="text-link" href="progress.html#updates">View updates →</a></section>
+<p id="basic-message" class="status" role="status"></p>
+</div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase.js"></script><script src="app-core.js"></script><script src="home.js"></script><script src="floating-nav.js"></script>
 </body></html>

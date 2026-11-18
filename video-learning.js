@@ -1,15 +1,76 @@
-/* Random featured lesson page. Uses moderated Reels records and private storage. */
+/* Read-only published lesson library. Student submissions are handled separately by student_reels. */
 (() => {
   'use strict';
-  const $=id=>document.getElementById(id),BUCKET='video-lessons',MAX=100*1024*1024;let user=null,isPro=false,lessons=[],featured=-1,timer=null;
-  const say=(id,msg,type='')=>{const e=$(id);if(e){e.textContent=msg;e.className='status '+type;}};
-  const ytId=raw=>{try{const u=new URL(raw),h=u.hostname.toLowerCase().replace(/^www\./,'');if(h==='youtu.be')return u.pathname.split('/').filter(Boolean)[0]||null;if(['youtube.com','m.youtube.com','youtube-nocookie.com'].includes(h)){if(u.pathname==='/watch')return u.searchParams.get('v');const p=u.pathname.split('/').filter(Boolean);if(['embed','shorts','live'].includes(p[0]))return p[1]||null;}}catch(_){}return null;};
-  const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  async function source(v){if(v.source_type==='youtube')return 'https://www.youtube-nocookie.com/embed/'+encodeURIComponent(v.youtube_id)+'?rel=0';const {data,error}=await MSS.client().storage.from(BUCKET).createSignedUrl(v.storage_path,1800);if(error)throw error;return data.signedUrl;}
-  async function show(v){const player=$('featured-player');player.replaceChildren();$('featured-title').textContent=v?.title||'No lessons available yet';$('featured-topic').textContent=v?`${v.subject} · ${v.topic||'General topic'}`:'Approved learning lessons will appear here.';$('featured-source').textContent=v?`${v.content_level==='advanced'?'Advanced':'Standard'} · ${v.source_type==='youtube'?'YouTube lesson':'Student upload'}`:'Waiting for approved lessons';if(!v){const p=document.createElement('p');p.className='muted';p.textContent='No approved lessons are available yet.';player.append(p);return;}try{const url=await source(v);if(v.source_type==='youtube'){const frame=document.createElement('iframe');frame.src=url;frame.title=v.title;frame.allow='accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';frame.allowFullscreen=true;frame.loading='lazy';player.append(frame);}else{const video=document.createElement('video');video.controls=true;video.playsInline=true;video.preload='metadata';const src=document.createElement('source');src.src=url;src.type=v.mime_type||'video/mp4';video.append(src);player.append(video);}}catch(_){const p=document.createElement('p');p.className='muted';p.textContent='This lesson could not be loaded.';player.append(p);}}
-  async function randomLesson(){if(!lessons.length){await show(null);return;}let n=lessons.length===1?0:Math.floor(Math.random()*lessons.length);if(lessons.length>1&&n===featured)n=(n+1)%lessons.length;featured=n;await show(lessons[n]);}
-  function renderLibrary(){const filter=$('library-filter').value,rows=lessons.filter(v=>!filter||v.subject===filter),root=$('video-library');root.replaceChildren();if(!rows.length){const e=document.createElement('div');e.className='empty-state';e.textContent='No lessons for this subject yet.';root.append(e);}else rows.forEach(v=>{const card=document.createElement('article');card.className='notice';const h=document.createElement('h3');h.textContent=v.title;const p=document.createElement('p');p.textContent=`${v.subject} · ${v.topic||'General'} · ${v.content_level==='advanced'?'Advanced':'Standard'}`;const b=document.createElement('button');b.className='btn btn-soft';b.type='button';b.textContent='Play this lesson';b.addEventListener('click',async()=>{featured=lessons.findIndex(x=>x.id===v.id);await show(v);window.scrollTo({top:0,behavior:'smooth'});});card.append(h,p,b);root.append(card);});say('library-status',`${rows.length} shown · ${lessons.length} approved lessons`);}
-  async function load(){let q=MSS.client().from('video_lessons').select('id,user_id,title,subject,topic,source_type,youtube_id,storage_path,mime_type,content_level,created_at').eq('approval_status','approved').order('created_at',{ascending:false}).limit(100);if(!isPro)q=q.eq('content_level','standard');const {data,error}=await q;if(error){say('library-status','Reels database is not ready. Apply mss-learning-setup.sql in Supabase.','error');$('video-library').innerHTML='<div class="empty-state">Could not load approved lessons. Apply the Supabase setup SQL.</div>';return;}lessons=data||[];renderLibrary();await randomLesson();if(timer)clearInterval(timer);timer=setInterval(()=>void randomLesson(),30000);}
-  async function submit(e){e.preventDefault();const title=$('video-title').value.trim(),subject=$('video-subject').value,topic=$('video-topic').value.trim(),url=$('youtube-url').value.trim(),file=$('video-file').files[0];if(!title||!subject||!topic)return say('upload-status','Complete title, subject and topic.','error');if(Boolean(url)===Boolean(file))return say('upload-status','Choose exactly one source: a YouTube URL or a video file.','error');const b=$('submit-video');b.disabled=true;b.textContent='Submitting…';let path=null;try{const record={user_id:user.id,title,subject,topic,source_type:'youtube',youtube_id:null,storage_path:null,mime_type:null,approval_status:'pending',content_level:isPro?$('video-level').value:'standard'};if(url){const id=ytId(url);if(!id||!/^[A-Za-z0-9_-]{6,20}$/.test(id))throw Error('Enter a valid YouTube video link.');record.youtube_id=id;}else{if(!file.type.startsWith('video/'))throw Error('Choose a valid video file.');if(file.size>MAX)throw Error('Video file must be 100 MB or smaller.');path=`${user.id}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;const {error:up}=await MSS.client().storage.from(BUCKET).upload(path,file,{contentType:file.type,upsert:false});if(up)throw up;record.source_type='upload';record.storage_path=path;record.mime_type=file.type;}const {error}=await MSS.client().from('video_lessons').insert(record);if(error)throw error;$('video-upload-form').reset();say('upload-status','Your video has been submitted for moderator review. It will appear after approval.','success');}catch(err){if(path)await MSS.client().storage.from(BUCKET).remove([path]);say('upload-status',err.message||'Submission failed.','error');}finally{b.disabled=false;b.textContent='Submit for review';}}
-  document.addEventListener('DOMContentLoaded',async()=>{try{user=await MSS.currentUser();if(!user){location.replace('login.html');return;}const membership=await MSS.latestMembership(user.id);isPro=membership.active;$('video-back').href=isPro?'pro.html':'basic.html';if(isPro&&membership.expiresAt){const expiry=Date.parse(membership.expiresAt);if(Number.isFinite(expiry))setInterval(()=>{if(Date.now()>=expiry)location.replace('basic.html');},60000);}if(isPro)$('video-level-wrap').hidden=false;await load();$('library-filter').addEventListener('change',renderLibrary);$('video-upload-form').addEventListener('submit',submit);}catch(e){say('library-status',e.message||'Could not verify your account.','error');}});
+  const $=id=>document.getElementById(id);
+  let lessons=[],featuredIndex=-1,rotateTimer=null,area='basic';
+  const say=(message,type='')=>{const el=$('library-status');el.textContent=message;el.className='status '+type;};
+  const make=(tag,className,text)=>{const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=String(text??'');return el;};
+  function youtubeId(raw){
+    try{const u=new URL(raw),h=u.hostname.toLowerCase().replace(/^www\./,'');if(h==='youtu.be')return u.pathname.split('/').filter(Boolean)[0]||null;if(['youtube.com','m.youtube.com','youtube-nocookie.com'].includes(h)){if(u.pathname==='/watch')return u.searchParams.get('v');const p=u.pathname.split('/').filter(Boolean);if(['embed','shorts','live'].includes(p[0]))return p[1]||null;}}catch(_){}return null;
+  }
+  function safeUrl(raw){try{const u=new URL(raw);return u.protocol==='https:'?u.href:null;}catch(_){return null;}}
+  function playerFor(lesson){
+    const player=$('featured-player');player.replaceChildren();
+    $('featured-title').textContent=lesson?.lesson_title||'No published lessons yet';
+    $('featured-topic').textContent=lesson?`${lesson.topic_name||'General topic'}${lesson.duration_minutes?` · ${lesson.duration_minutes} minutes`:''}`:'Published lessons will appear here when available.';
+    $('featured-description').textContent=lesson?.lesson_description||'';
+    $('featured-source').textContent=lesson?`${String(lesson.video_provider||'external').toUpperCase()} lesson`:'Lesson library';
+    if(!lesson){player.append(make('p','muted','No published lessons are available yet.'));return;}
+    const url=safeUrl(lesson.video_url);
+    if(!url){player.append(make('p','muted','This lesson does not have a valid secure video link.'));return;}
+    const provider=String(lesson.video_provider||'external').toLowerCase();
+    if(provider==='youtube'){
+      const id=youtubeId(url);
+      if(!id){player.append(make('a','btn btn-primary','Open lesson on YouTube'));const a=player.querySelector('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';return;}
+      const frame=make('iframe');frame.src=`https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?rel=0`;frame.title=lesson.lesson_title;frame.loading='lazy';frame.allow='accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share';frame.allowFullscreen=true;frame.referrerPolicy='strict-origin-when-cross-origin';player.append(frame);
+    }else if(provider==='vimeo'){
+      const match=url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+      if(match){const frame=make('iframe');frame.src=`https://player.vimeo.com/video/${match[1]}`;frame.title=lesson.lesson_title;frame.allow='autoplay; fullscreen; picture-in-picture';frame.allowFullscreen=true;player.append(frame);}
+      else{const a=make('a','btn btn-primary','Open lesson');a.href=url;a.target='_blank';a.rel='noopener noreferrer';player.append(a);}
+    }else{
+      const a=make('a','btn btn-primary','Open lesson');a.href=url;a.target='_blank';a.rel='noopener noreferrer';player.append(a);
+    }
+  }
+  function renderList(){
+    const root=$('video-library');root.replaceChildren();
+    const q=$('lesson-search').value.trim().toLowerCase();
+    const rows=lessons.filter(x=>`${x.lesson_title||''} ${x.topic_name||''} ${x.lesson_description||''}`.toLowerCase().includes(q));
+    if(!rows.length){root.append(make('div','empty-state','No published lessons match your search.'));return;}
+    rows.forEach(lesson=>{
+      const card=make('article','lesson-card');
+      card.append(make('h3','',lesson.lesson_title));
+      card.append(make('p','lesson-meta',`${lesson.topic_name||'General topic'}${lesson.duration_minutes?` · ${lesson.duration_minutes} min`:''}`));
+      if(lesson.lesson_description)card.append(make('p','muted',lesson.lesson_description));
+      const b=make('button','btn btn-soft','Play lesson');b.type='button';b.addEventListener('click',()=>{featuredIndex=lessons.findIndex(x=>x.id===lesson.id);playerFor(lesson);window.scrollTo({top:0,behavior:'smooth'});});
+      card.append(b);root.append(card);
+    });
+  }
+  async function load(){
+    const {data,error}=await MSS.client().from('video_lessons')
+      .select('id,lesson_title,lesson_description,topic_name,duration_minutes,video_provider,video_url,created_at')
+      .eq('is_published',true).order('created_at',{ascending:false}).limit(100);
+    if(error)throw error;
+    lessons=data||[];renderList();say(`${lessons.length} published lesson${lessons.length===1?'':'s'} loaded.`);
+    await randomLesson();
+    if(rotateTimer)clearInterval(rotateTimer);
+    rotateTimer=setInterval(()=>void randomLesson(),30000);
+  }
+  async function randomLesson(){
+    if(!lessons.length){playerFor(null);return;}
+    let next=lessons.length===1?0:Math.floor(Math.random()*lessons.length);
+    if(lessons.length>1&&next===featuredIndex)next=(next+1)%lessons.length;
+    featuredIndex=next;playerFor(lessons[next]);
+  }
+  document.addEventListener('DOMContentLoaded',async()=>{
+    try{
+      const user=await MSS.currentUser();if(!user){location.replace('login.html');return;}
+      try{const m=await MSS.latestMembership(user.id);area=m.active?'pro':'basic';}catch(_){area='basic';}
+      document.body.dataset.area=area;
+      const home=area==='pro'?'pro.html':'basic.html',reels=area==='pro'?'pro-reels.html':'basic-reels.html';
+      $('video-back').href=home;$('video-brand').href=home;$('video-area-label').textContent=area==='pro'?'PRO LEARNING':'BASIC LEARNING';
+      $('reels-link').href=reels;$('reels-link-bottom').href=reels;
+      $('lesson-search').addEventListener('input',renderList);
+      await load();
+    }catch(error){say(error.message||'The lesson library could not be loaded.','error');$('video-library').replaceChildren(make('div','empty-state','Please try again later.'));}
+  });
 })();

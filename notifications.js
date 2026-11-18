@@ -8,7 +8,7 @@
   async function load(){
     const pref=await MSS.client().from('student_notification_preferences').select('allow_announcements,allow_learning,allow_membership').eq('user_id',user.id).maybeSingle();if(!pref.error&&pref.data)preferences=pref.data;
     const {data,error}=await MSS.client().from('student_notifications').select('id,title,body,category,read_at,created_at,link_url').eq('user_id',user.id).order('created_at',{ascending:false}).limit(100);
-    if(error){$('notification-list').innerHTML='<div class="empty-state">Notifications are not connected yet. The database setup script must be applied first.</div>';setStatus('Setup required: apply mss-learning-setup.sql in Supabase.','error');$('notification-summary').textContent='Unable to load notifications';return;}
+    if(error){$('notification-list').innerHTML='<div class="empty-state">Notifications are not connected yet. Check the optional Settings/Notifications database instructions.</div>';setStatus('Notifications database tables are not available. Check the optional Settings/Notifications SQL instructions.','error');$('notification-summary').textContent='Unable to load notifications';return;}
     rows=(data||[]).filter(permitted);render();
   }
   function render(){

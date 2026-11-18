@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Student Reels Moderation | My Study Station</title><link rel="stylesheet" href="style.css">
+<style>
+.modmain{max-width:1050px;margin:auto;padding:28px 5vw 80px}
+.modcard{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0}
+.modactions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.modstatus{min-height:1.4em;color:var(--gold)}
+.modvideo{display:block;width:100%;max-width:680px;max-height:360px;border-radius:14px;margin:12px 0;background:#050a14}
+.modmeta{color:var(--muted);font-size:.9rem}
+.modcard h2{margin:0 0 8px}
+</style></head><body>
+<header class="topbar"><a class="brand brand-link" href="admin.html"><span class="brand-mark">✦</span> MY STUDY STATION <small>ADMIN WORKSPACE</small></a><a class="btn btn-ghost" href="admin.html">Back to Admin</a></header>
+<main class="modmain"><div class="eyebrow">SAFE LEARNING COMMUNITY</div><h1>Student Reels Moderation</h1>
+<p class="muted">Review student-submitted learning videos before publication. Only approved Reels are visible in student feeds.</p>
+<p id="mod-status" class="modstatus" role="status">Verifying administrator permissions…</p>
+<section id="pending-list"><div class="modcard">Loading pending submissions…</div></section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase.js"></script><script src="reels-moderation.js"></script>
+</body></html>

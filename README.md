@@ -1,5 +1,7 @@
-# My Study Station Pro Learning
+# My Study Station
 
-First implementation pass for the Basic and Pro learning dashboards. See `IMPLEMENTATION-NOTES.md` and `README-SETUP.txt` before installation.
+Complete working website package based on the latest ZIP uploaded by the user.
 
-The original project ZIP should be kept as a backup. The included Supabase migration has not been executed and this package has not been deployed.
+The Basic and Pro dashboards follow the previously approved Basic (bright blue/white/soft gold) and Pro (premium navy/gold) visual designs. See `README-SETUP.txt` and `IMPLEMENTATION-NOTES.md` before deployment.
+
+The live website has not been changed. This package has not been tested against the live Supabase project; use a preview deployment first.

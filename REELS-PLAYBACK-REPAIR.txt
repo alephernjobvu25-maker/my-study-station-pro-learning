@@ -1,0 +1,24 @@
+MY STUDY STATION — REELS VIEWER UPDATE
+
+This package keeps the existing Supabase connection, private student-reels storage bucket, signed-URL playback, database tables, RLS policies, and existing uploaded videos unchanged.
+
+Reels viewer improvements:
+- Replaced the large branded header with a compact top navigation bar and Home link.
+- Removed the search/filter strip, status row, and fixed bottom navigation from the viewing pages so the video has the available screen space.
+- Each reel now occupies one full viewing screen, with vertical scroll snapping between videos.
+- Kept the title, subject/topic details, description, action rail, and floating upload button over the video.
+- Fixed the automatic-next-video handler so both uploaded videos and YouTube embeds use the same index-based next-slide logic. The earlier file had two functions with the same name; the later one overrode the index-based version, preventing the ended event from advancing correctly.
+- Kept upload pages and their forms separate from the viewing page.
+
+Validation performed:
+- JavaScript syntax check passed with Node.js.
+- ZIP archive integrity check performed after packaging.
+- This is a local code/package validation only. It has not been deployed to Netlify or tested against the live Supabase project from this environment.
+
+Focused viewer follow-up (18 Nov 2026)
+- Added a compact back + search header to Basic and Pro Reels.
+- Header hides while scrolling down and reappears while scrolling up.
+- Local uploaded videos attempt muted autoplay after the previous reel ends, which is more compatible with mobile browser autoplay rules. If the browser still blocks playback, a Tap to play fallback appears.
+- YouTube embeds request muted autoplay and are also started through the YouTube player API when available.
+- Added a creator badge. At present, the existing schema does not provide a public profile-photo endpoint or a verified public avatar field. Other users' private profile/photo settings must not be bypassed, so the badge uses a safe generic avatar for other creators and the signed-in user's initials for their own reels until a privacy-safe public profile-photo feature is implemented.
+- No database tables, RLS policies, storage settings, or existing uploaded videos were changed.

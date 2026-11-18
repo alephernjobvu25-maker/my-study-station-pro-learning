@@ -3,12 +3,60 @@
   const $ = id => document.getElementById(id);
   const area = document.body.dataset.area || 'pro';
   const status = (message, type='') => { const el=$('home-status') || $('basic-message'); if(el){el.textContent=message;el.className='status '+type;} };
+
+  async function loadFeaturedReels(){
+    const root=$('home-featured-reels');
+    if(!root || !window.MSS || !MSS.client())return;
+    const make=(tag,cls,text)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;};
+    try{
+      const {data,error}=await MSS.client().from('student_reels')
+        .select('id,title,subject,source_type,youtube_id,storage_path,mime_type,access_tier,created_at')
+        .eq('moderation_status','approved').order('created_at',{ascending:false}).limit(3);
+      if(error)throw error;
+      root.replaceChildren();
+      if(!data?.length){root.append(make('div','home-reel-empty','New featured learning videos will appear here after they are approved.'));return;}
+      for(const reel of data){
+        const link=make('a','home-reel-card');
+        link.href=area==='pro'?'pro-reels.html':'basic-reels.html';
+        link.setAttribute('aria-label',`Open Learning Reels: ${reel.title||'Featured video'}`);
+        const thumb=make('div','home-reel-thumb');
+        if(reel.source_type==='youtube' && reel.youtube_id){
+          const img=make('img');img.src=`https://img.youtube.com/vi/${encodeURIComponent(reel.youtube_id)}/hqdefault.jpg`;img.alt='';img.loading='lazy';
+          img.onerror=()=>{img.remove();};thumb.append(img);
+        }else if(reel.source_type==='upload' && reel.storage_path){
+          try{
+            const {data: signed,error: signedError}=await MSS.client().storage.from('student-reels').createSignedUrl(reel.storage_path,900);
+            if(!signedError && signed?.signedUrl){const video=make('video');video.src=signed.signedUrl;video.muted=true;video.playsInline=true;video.preload='metadata';video.setAttribute('aria-hidden','true');thumb.append(video);}
+          }catch(_){/* Keep the branded play tile when a private preview is unavailable. */}
+        }
+        thumb.append(make('span','home-reel-play','▶'));
+        const info=make('div','home-reel-info');
+        info.append(make('strong','',reel.title||'Learning video'));
+        info.append(make('small','',`${reel.subject||'General'} · ${reel.access_tier==='pro'?'Pro':'Basic'} Reel`));
+        link.append(thumb,info);root.append(link);
+      }
+    }catch(error){
+      root.replaceChildren(make('div','home-reel-empty','Featured videos are temporarily unavailable. You can still explore all Learning Reels.'));
+    }
+  }
+  function renderHomeProgress(userId){
+    if(area!=='pro')return;
+    const read=(key)=>{try{const value=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(value)?value:[];}catch(_){return[];}};
+    const quizzes=read(`mss_progress_quizzes_${userId}_v2`);
+    const sessions=read(`mss_progress_sessions_${userId}_v2`);
+    const average=quizzes.length?Math.round(quizzes.reduce((sum,q)=>sum+(Number(q.total)>0?100*Number(q.score)/Number(q.total):0),0)/quizzes.length):0;
+    if($('home-quiz-count'))$('home-quiz-count').textContent=String(quizzes.length);
+    if($('home-average-score'))$('home-average-score').textContent=average+'%';
+    if($('home-study-count'))$('home-study-count').textContent=String(sessions.length);
+    if($('home-average-fill'))$('home-average-fill').style.width=Math.max(0,Math.min(100,average))+'%';
+  }
   async function init(){
     if(!window.MSS || !window.supabaseClient){status('The learning system could not connect. Please refresh and try again.','error');return;}
     try{
       const result=await MSS.requireArea(area);if(!result)return;
       if(area==='pro' && (!result.membership || !result.membership.active) && !result.privileged) {status(result.error?.message || 'We could not verify your Pro membership. Please try again.','error');return;}
       const name=MSS.displayName(result.profile,result.user);
+      renderHomeProgress(result.user.id);
       if($('student-name')) $('student-name').textContent=name;
       if($('student-avatar')) $('student-avatar').textContent=(name.trim()[0]||'L').toUpperCase();
       if($('student-number')) $('student-number').textContent=result.profile.student_number||'Pending confirmation';
@@ -21,7 +69,8 @@
       const basicSwitch=$('switch-basic-preview');if(basicSwitch&&result.privileged)basicSwitch.hidden=false;
       const proSwitch=$('switch-pro-preview');if(proSwitch&&result.privileged)proSwitch.hidden=false;
       const logout=$('logout');if(logout)logout.addEventListener('click',MSS.logout);
-      if(area==='pro' && m?.expiresAt && !result.privileged){const expiry=Date.parse(m.expiresAt);setInterval(()=>{const left=expiry-Date.now();if(left<=0){window.location.replace('basic.html');return;}const days=Math.max(0,Math.ceil(left/86400000));$('membership-days').textContent=String(days);},60000);}
+      if(area==='pro' && result.membership?.expiresAt && !result.privileged){const expiry=Date.parse(result.membership.expiresAt);setInterval(()=>{const left=expiry-Date.now();if(left<=0){window.location.replace('basic.html');return;}const days=Math.max(0,Math.ceil(left/86400000));$('membership-days').textContent=String(days);},60000);}
+      await loadFeaturedReels();
       setupPromo();
     }catch(error){status(error.message||'Could not load your learning space.','error');}
   }

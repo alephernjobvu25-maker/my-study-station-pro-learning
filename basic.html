@@ -1,17 +1,40 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#1768d5"><title>Basic Learning | My Study Station</title><link rel="stylesheet" href="learning.css"><script src="theme.js"></script></head>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0757bd"><title>Basic Learning | My Study Station</title>
+<link rel="stylesheet" href="learning.css"><link rel="stylesheet" href="dashboard-design.css"><script src="theme.js"></script>
+</head>
 <body data-area="basic">
-<header class="app-header"><div class="header-inner"><a class="brand" href="basic.html"><img src="mystudystation-pro-learning-logo.png" alt=""><span>MY STUDY STATION<small>BASIC LEARNING</small></span></a><div class="header-actions"><a class="icon-btn" href="basic-notifications.html" aria-label="Notifications">♢</a><a class="avatar" href="profile.html?area=basic" aria-label="My profile" id="student-avatar">L</a><button class="btn btn-soft" id="logout" type="button">Log out</button></div></div></header>
-<main class="page"><div id="home-status" class="status" role="status">Checking your account…</div><div id="protected-content" hidden>
-<section class="welcome"><div><div class="eyebrow">YOUR LEARNING SPACE</div><h1 class="page-title">Welcome back, <span id="student-name">Learner</span>!</h1><p>Choose a learning activity and keep moving forward.</p><a class="btn btn-soft" id="switch-pro-preview" href="pro.html" hidden style="margin-top:12px">Preview Pro</a></div></section>
-<section class="promo" id="pro-promo" data-slide="0" aria-live="polite"><div class="promo-kicker" id="promo-kicker">GROW YOUR LEARNING</div><h2 id="promo-title">Explore Advanced Learning</h2><p id="promo-copy">Discover advanced notes, lessons and learning resources with Pro Learning.</p><div class="promo-actions"><a class="btn" href="subscription-expired.html">Explore Pro Learning</a></div><div class="promo-dots" aria-label="Pro Learning highlights"><button class="promo-dot" data-slide-to="0" aria-label="Show advanced learning" aria-current="true"></button><button class="promo-dot" data-slide-to="1" aria-label="Show progress tracking"></button><button class="promo-dot" data-slide-to="2" aria-label="Show learning together"></button></div></section>
-<section style="margin-top:22px"><div class="section-head"><h2>Quick access</h2><span class="muted">Your learning tools</span></div><div class="grid grid-4">
-<a class="tile" href="basic-reels.html"><span class="tile-icon">▶</span><b>Learning Reels</b><small>Short educational videos</small></a>
-<a class="tile" href="basic-notifications.html"><span class="tile-icon">♢</span><b>Notifications</b><small>Announcements and reminders</small></a>
-<div class="tile" aria-disabled="true"><span class="tile-icon">▤</span><b>Basic Study Notes</b><small>Basic resource library — coming next</small></div>
-<div class="tile" aria-disabled="true"><span class="tile-icon">▧</span><b>Practice Resources</b><small>Basic practice library — coming next</small></div>
-</div></section>
-<section style="margin-top:22px"><div class="section-head"><h2>Continue learning</h2></div><div class="grid grid-2"><article class="panel"><h3>Keep learning</h3><p class="muted">Explore approved educational videos in Basic Reels.</p><a class="btn btn-primary" href="basic-reels.html">Explore Reels</a></article><article class="panel"><h3>More Basic tools are coming</h3><p class="muted">The separate Basic notes, quizzes and achievements areas will be added in the next implementation stage.</p></article></div></section>
-<p id="basic-message" class="status" role="status"></p></div></main>
+<header class="app-header"><div class="header-inner">
+<a class="brand" href="basic.html"><img src="mystudystation-pro-learning-logo.png" alt=""><span>MY STUDY STATION<small>BASIC LEARNING</small></span></a>
+<div class="header-actions"><a class="icon-btn" href="basic-notifications.html" aria-label="Notifications">♢</a><a class="avatar" href="profile.html?area=basic" aria-label="My profile" id="student-avatar">L</a><button class="btn btn-soft" id="logout" type="button">Log out</button></div>
+</div></header>
+<main class="page home-dashboard">
+<div id="home-status" class="status" role="status">Checking your account…</div>
+<div id="protected-content" hidden>
+<section class="home-welcome">
+  <div><div class="eyebrow">YOUR LEARNING SPACE</div><h1>Welcome back, <span id="student-name">Learner</span></h1><p>Take your time, explore and learn at your own pace.</p></div>
+  <a class="home-profile-link" href="profile.html?area=basic" aria-label="Open profile">↗</a>
+</section>
+<section class="home-section home-reels-section">
+  <div class="section-head"><div><div class="eyebrow">A LITTLE INSPIRATION</div><h2>Learning Reels</h2><p class="section-subtitle">A few ideas to spark your curiosity.</p></div><a class="text-link" href="basic-reels.html">Explore all <span aria-hidden="true">→</span></a></div>
+  <div id="home-featured-reels" class="home-reel-grid" aria-live="polite"><div class="home-reel-placeholder">Finding featured learning videos…</div></div>
+</section>
+<section class="home-section">
+  <div class="section-head"><div><div class="eyebrow">YOUR EVERYDAY TOOLS</div><h2>Explore your learning space</h2></div></div>
+  <div class="home-tools-grid">
+    <a class="home-tool" href="video-learning.html"><span class="home-tool-icon">▶</span><span><b>Video Lessons</b><small>Learn from lesson videos</small></span><span class="tool-arrow">→</span></a>
+    <a class="home-tool" href="basic-reels.html"><span class="home-tool-icon">▣</span><span><b>Learning Reels</b><small>Short educational videos</small></span><span class="tool-arrow">→</span></a>
+    <a class="home-tool" href="basic-notifications.html"><span class="home-tool-icon">♢</span><span><b>Notifications</b><small>Updates and reminders</small></span><span class="tool-arrow">→</span></a>
+    <a class="home-tool" href="profile.html?area=basic"><span class="home-tool-icon">◎</span><span><b>My Profile</b><small>Your account information</small></span><span class="tool-arrow">→</span></a>
+  </div>
+</section>
+<section class="home-upgrade-strip">
+  <div><div class="eyebrow">READY FOR MORE?</div><h2>Discover Pro Learning</h2><p>Explore more study resources and tools when you are ready.</p></div>
+  <a class="btn btn-primary" href="subscription-expired.html">Explore Pro <span aria-hidden="true">→</span></a>
+</section>
+<p id="basic-message" class="status" role="status"></p>
+</div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase.js"></script><script src="app-core.js"></script><script src="home.js"></script><script src="floating-nav.js"></script>
 </body></html>
