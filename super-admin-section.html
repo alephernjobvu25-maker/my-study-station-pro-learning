@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Super Admin Workspace | My Study Station</title><link rel="stylesheet" href="super-admin.css"></head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar" aria-label="Super Administrator navigation">
+    <a class="brand" href="super-admin.html"><img src="mystudystation-pro-learning-logo.png" alt="" onerror="this.hidden=true"><span><b>MY STUDY STATION</b><small>SUPER ADMINISTRATION</small></span></a>
+    <div class="owner-chip"><span class="owner-dot"></span> PRIVATE OWNER WORKSPACE</div>
+    <nav>
+      <div class="nav-group"><span class="nav-label">MAIN</span><a class="nav-link" href="super-admin.html"><span class="nav-icon">▦</span>Dashboard</a><a class="nav-link" href="super-admin-section.html?section=analytics"><span class="nav-icon">▥</span>Platform Analytics</a></div>
+      <div class="nav-group"><span class="nav-label">MANAGEMENT</span><a class="nav-link" href="super-admin-section.html?section=students"><span class="nav-icon">♙</span>Student Management</a><a class="nav-link" href="admin-management.html"><span class="nav-icon">♧</span>Administrator Management</a><a class="nav-link" href="super-admin-section.html?section=schools"><span class="nav-icon">⌂</span>Schools &amp; Communities</a><a class="nav-link" href="super-admin-section.html?section=subscriptions"><span class="nav-icon">◇</span>Subscriptions</a></div>
+      <div class="nav-group"><span class="nav-label">CONTENT &amp; SUPPORT</span><a class="nav-link" href="reels-moderation.html"><span class="nav-icon">▷</span>Content Moderation</a><a class="nav-link" href="super-admin-section.html?section=community"><span class="nav-icon">◎</span>Community Management</a><a class="nav-link" href="super-admin-section.html?section=feedback"><span class="nav-icon">✉</span>Client Feedback</a></div>
+      <div class="nav-group"><span class="nav-label">SECURITY &amp; CONTROL</span><a class="nav-link" href="super-admin-section.html?section=audit"><span class="nav-icon">▤</span>Audit Logs</a><a class="nav-link" href="super-admin-section.html?section=security"><span class="nav-icon">⬡</span>Security Centre</a><a class="nav-link" href="super-admin-section.html?section=settings"><span class="nav-icon">⚙</span>Platform Settings</a></div>
+      <div class="nav-group"><span class="nav-label">ACCOUNT</span><a class="nav-link" href="super-admin-section.html?section=profile"><span class="nav-icon">◉</span>My Admin Profile</a></div>
+      <div class="nav-group"><span class="nav-label">ACCOUNT SECURITY</span><a class="nav-link" href="super-admin-security.html"><span class="nav-icon">⌑</span>Account Security</a></div>
+    </nav>
+    <div class="sidebar-bottom"><span class="secure-mark">✓</span><span>Protected by database role checks</span></div>
+  </aside>
+  <div class="mobile-scrim" id="scrim"></div>
+  <main class="main-area">
+    <header class="topbar"><div class="topbar-left"><button class="icon-button menu-button" id="menuButton">☰</button><button class="icon-button collapse-button" id="collapseButton">⇤</button><div><div class="crumb">MY STUDY STATION <span>/</span> OWNER WORKSPACE</div><div class="topbar-title" id="topTitle">Management Workspace</div></div></div><div class="topbar-actions"><span class="live-indicator"><i></i> Secure session</span><button class="icon-button theme-button" id="themeButton">☀</button><button class="signout-button" id="signOutButton">Sign out</button></div></header>
+    <section class="page-content"><div class="welcome-row"><div><div class="eyebrow">SUPER ADMINISTRATOR</div><h1 id="sectionTitle">Workspace</h1><p id="sectionDescription">A dedicated workspace for this platform function.</p></div><a class="refresh-button" href="super-admin.html">← Dashboard</a></div>
+      <section class="panel"><div class="activity-empty"><span class="activity-symbol">✦</span><div><b id="comingTitle">This workspace is planned for the next development stage.</b><p id="comingDescription">The navigation and page structure are ready. Its data operations will be added individually after the relevant database tables and permissions are verified.</p></div></div></section>
+      <footer>My Study Station Pro Learning <span>•</span> Private Super Administrator Workspace</footer>
+    </section>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase.js"></script><script src="super-admin-section.js"></script>
+</body></html>

@@ -1,0 +1,35 @@
+MY STUDY STATION — STUDENT PROFILE AND VIDEO CREATOR UPDATE
+
+WHAT THIS UPDATE ADDS
+1. The signed-in student's profile picture appears on the Basic and Pro dashboard profile icon.
+2. Approved video cards show a creator's display name and profile picture when that student has allowed those details to be visible.
+3. Tapping a creator's name or picture opens that student's public profile.
+4. That page lists only approved student_reels rows uploaded by that exact student (filtered by user_id). Pending and rejected submissions are not shown.
+5. Students who switch off "Approved uploads" do not show their video list on their public profile.
+6. Photos remain in the private student-profile-photos bucket. Other students can read a photo only when its owner enables "Profile picture" in Settings.
+7. Sensitive account details are not returned by the public profile function.
+
+SUPABASE STEP — REQUIRED ONCE
+1. Open the existing My Study Station project in Supabase.
+2. Open SQL Editor and create a new query.
+3. Open student-public-profile-access.sql from this ZIP, copy all its contents, paste into SQL Editor, and Run.
+4. This is an additive migration. It does not recreate the bucket, change the student-reels bucket, or modify existing video records.
+
+WEBSITE FILES
+Upload/replace the files in this ZIP using the same method you use for the current Cloudflare-hosted site. Keep the existing Supabase publishable key configuration in supabase.js. Never upload a service-role key.
+
+TEST IN SPCK FIRST
+1. Sign in as Student A and upload a profile picture.
+2. In Settings, enable Profile picture, Display name, and Approved uploads; save.
+3. Upload a learning video and wait for approval.
+4. Sign in as Student B, open the approved video feed, and tap Student A's name or picture.
+5. Confirm Student A's public profile shows only Student A's approved videos.
+6. Turn off Student A's Profile picture setting and confirm their photo is no longer shown to Student B. Turn off Approved uploads and confirm the video list is hidden.
+7. Confirm Student A's own dashboard and private profile still show their own picture.
+
+IMPORTANT
+The ZIP has been checked for archive integrity and JavaScript syntax. It has not been run against your live Supabase project or deployed to Cloudflare. Run the new SQL migration before testing the public profile feature.
+
+
+SQL FIX NOTICE:
+The supplied student-public-profile-access.sql now creates the missing public.profile_visibility table and applies owner-only RLS policies before defining the public profile functions. Run the complete SQL file once in the correct Supabase project.

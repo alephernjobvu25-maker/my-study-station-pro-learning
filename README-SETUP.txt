@@ -41,3 +41,7 @@ DEPLOYMENT
 4. Do not upload database/ as website files.
 5. Test Basic student, active Pro student, expired Pro student, Super Admin preview, and a separate active administrator account.
 6. Only replace the live website after the preview tests pass.
+
+
+STUDENT PUBLIC PROFILE UPDATE
+See STUDENT-PUBLIC-PROFILE-SETUP.txt. Run student-public-profile-access.sql once before testing public creator profiles.

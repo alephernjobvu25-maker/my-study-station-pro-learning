@@ -4,11 +4,13 @@
   'use strict';
   const $ = id => document.getElementById(id);
   const BUCKET = 'student-reels';
+  const PHOTO_BUCKET = 'student-profile-photos';
   const MAX_BYTES = 100 * 1024 * 1024;
   const ALLOWED_MIME = new Set(['video/mp4','video/webm','video/ogg','video/quicktime']);
   const area = document.body.dataset.area === 'pro' ? 'pro' : 'basic';
   let user = null, profile = null, isActivePro = false, privileged = false, reels = [];
   let youtubePlayers = [], renderedRows = [];
+  let creatorProfiles = new Map();
   // Every Reel starts muted. Sound is enabled only by a deliberate Play tap on that Reel.
   let activeCard = null;
   let feedObserver = null;
@@ -99,6 +101,46 @@
       youtubePlayers.push({ frame, player });
     });
   }
+  async function loadCreatorProfiles(rows){
+    creatorProfiles=new Map();
+    const ids=[...new Set((rows||[]).map(row=>row.user_id).filter(Boolean))];
+    if(!ids.length)return;
+    let publicRows=[];
+    try{
+      const {data,error}=await MSS.client().rpc('get_public_student_profiles',{target_user_ids:ids});
+      if(error)throw error;
+      publicRows=data||[];
+    }catch(error){console.warn('Public creator profiles are not available yet:',error.message);}
+    const publicMap=new Map(publicRows.map(row=>[row.user_id,row]));
+    for(const id of ids){
+      if(id===user?.id){
+        creatorProfiles.set(id,{display_name:MSS.displayName(profile,user),photo_url:await getOwnPhotoUrl(id)});
+        continue;
+      }
+      const row=publicMap.get(id)||{};
+      const creator={display_name:row.display_name||'Student creator',photo_url:null};
+      if(row.show_profile_photo===true){
+        try{
+          const storage=MSS.client().storage.from(PHOTO_BUCKET);
+          const {data:files,error:listError}=await storage.list(id,{limit:20});
+          if(!listError){
+            const file=(files||[]).find(item=>/^profile-avatar\.(jpg|png|webp)$/i.test(item.name));
+            if(file){const {data:signed,error:signedError}=await storage.createSignedUrl(`${id}/${file.name}`,60);if(!signedError&&signed?.signedUrl)creator.photo_url=signed.signedUrl;}
+          }
+        }catch(error){console.warn('Creator photo could not be loaded:',error.message);}
+      }
+      creatorProfiles.set(id,creator);
+    }
+  }
+  async function getOwnPhotoUrl(userId){
+    try{
+      const storage=MSS.client().storage.from(PHOTO_BUCKET);
+      const {data:files,error}=await storage.list(userId,{limit:20});if(error)return null;
+      const file=(files||[]).find(item=>/^profile-avatar\.(jpg|png|webp)$/i.test(item.name));if(!file)return null;
+      const {data:signed,error:signedError}=await storage.createSignedUrl(`${userId}/${file.name}`,60);
+      return !signedError&&signed?.signedUrl?signed.signedUrl:null;
+    }catch(_){return null;}
+  }
   async function buildCard(reel, index) {
     const card=node('article','reel-card reels-video-slide');
     const player=node('div','reel-player');
@@ -134,10 +176,15 @@
     }
     const body=node('div','reel-body');
     const creator=node('div','reel-creator');
-    const avatar=node('span','reel-creator-avatar',reel.user_id===user?.id ? (MSS.displayName(profile,user).trim()[0]||'L').toUpperCase() : 'L');
+    const creatorInfo=creatorProfiles.get(reel.user_id)||{display_name:reel.user_id===user?.id?MSS.displayName(profile,user):'Student creator',photo_url:null};
+    const creatorLink=node('a','reel-creator-link');
+    creatorLink.href=`student-profile.html?area=${area}&id=${encodeURIComponent(reel.user_id)}`;
+    creatorLink.setAttribute('aria-label',`View ${creatorInfo.display_name}'s profile and uploaded videos`);
+    const avatar=node('span','reel-creator-avatar',(creatorInfo.display_name.trim()[0]||'L').toUpperCase());
     avatar.setAttribute('aria-hidden','true');
-    const creatorName=node('span','reel-creator-name',reel.user_id===user?.id ? MSS.displayName(profile,user) : 'Student creator');
-    creator.append(avatar,creatorName);
+    if(creatorInfo.photo_url){const photo=node('img');photo.src=creatorInfo.photo_url;photo.alt='';photo.loading='lazy';photo.onerror=()=>photo.remove();avatar.replaceChildren(photo);}
+    const creatorName=node('span','reel-creator-name',creatorInfo.display_name);
+    creatorLink.append(avatar,creatorName);creator.append(creatorLink);
     body.append(creator,node('h3','',reel.title));
     body.append(node('p','reel-meta',`${reel.subject||'General'} · ${reel.topic||'General topic'} · ${reel.access_tier==='pro'?'Pro':'Basic'} · ${formatDate(reel.created_at)}`));
     if(reel.description)body.append(node('p','muted',reel.description));
@@ -205,6 +252,7 @@
       .eq('moderation_status','approved').order('created_at',{ascending:false}).limit(60);
     if(error)throw error;
     reels=data||[];
+    await loadCreatorProfiles(reels);
     await renderFeedAsync();
     say('reel-status',`${reels.length} approved learning video${reels.length===1?'':'s'} available.`);
   }

@@ -1,0 +1,40 @@
+MY STUDY STATION — STUDENT PROFILE PICTURE UPDATE
+
+WHAT THIS UPDATE ADDS
+- Students can add a profile picture from their Android gallery/file picker.
+- Students can replace or remove their own picture.
+- Supported formats: JPG/JPEG, PNG and WebP.
+- Maximum image size: 2 MB.
+- The same shared profile page works for Basic and Pro Learning.
+
+PRIVACY AND SECURITY
+- Pictures are stored in a dedicated PRIVATE Supabase Storage bucket named
+  student-profile-photos.
+- Each student's files are stored under their authenticated user ID.
+- Storage policies allow each signed-in student to read, upload, replace and
+  delete only files in their own folder.
+- The page displays a short-lived signed URL only to the signed-in owner.
+- No service-role key is used in browser code.
+- Profile pictures remain private. The existing public-profile display endpoint
+  has not been implemented, so this update does not expose pictures to other
+  students, even if a visibility preference is selected.
+
+SETUP — IMPORTANT
+1. Keep a backup of your current live website files.
+2. In Supabase Dashboard, open SQL Editor.
+3. Review student-profile-photos-storage.sql, then run it once.
+   It creates/updates only the dedicated profile-photo bucket and its four
+   owner-only storage policies. It does not change your video buckets/tables.
+4. Upload the files from this ZIP to your website, replacing the matching files:
+   profile.html, profile.js and profile-page.css.
+   Keep all other existing website files unchanged.
+5. Sign in as a test student, open My Profile, choose “Add profile picture”,
+   select a JPG/PNG/WebP image under 2 MB, and verify it appears.
+6. Test replacing and removing the picture. Sign out and test another student
+   account to confirm the first student's picture is not accessible.
+
+NOTES
+- The photo upload control is in the profile page, not Settings, to avoid
+  duplicating navigation/actions.
+- This package has not been deployed to your live site or tested against your
+  Supabase project. Test in a local copy first.

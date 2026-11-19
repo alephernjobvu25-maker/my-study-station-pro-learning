@@ -1,10 +1,108 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Super Administrator | My Study Station Pro Learning</title>
-<style>
-:root{color-scheme:dark;--bg:#090d20;--panel:#121a30;--line:#2b3b5c;--text:#edf3ff;--muted:#a9b6d1;--gold:#f3d276}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#28235b 0,#090d20 55%);color:var(--text);font:15px system-ui}header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid var(--line)}main{max-width:850px;margin:auto;padding:24px}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;margin:16px 0}.tag{color:var(--gold);font-size:11px;letter-spacing:1px}h1{margin:8px 0}p{color:var(--muted);line-height:1.5}.actions{display:flex;gap:10px;flex-wrap:wrap}a,button{border-radius:10px;padding:11px 14px;background:#6657d9;color:white;text-decoration:none;border:0;font-weight:700}button.secondary,a.secondary{background:#202c45;border:1px solid var(--line)}#status{color:var(--gold)}
-</style><script src="theme.js"></script></head><body><header><b>My Study Station <span style="color:#f3d276">PRO</span></b><button id="logout" class="secondary">Sign out</button></header><main><div class="tag">OWNER-ONLY SECURE WORKSPACE</div><h1>Super Administrator</h1><p>Only an active Super Administrator can enter this workspace. Access is checked using the database RPC.</p><section class="card"><p id="status">Verifying your session and role…</p><div id="tools" class="actions" hidden><a href="admin-management.html">Manage administrators</a><a class="secondary" href="admin.html">Admin portal</a><a class="secondary" href="index.html">Main website</a></div></section></main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase.js"></script><script>
-(async()=>{const status=document.getElementById('status'),tools=document.getElementById('tools');const client=window.supabaseClient;if(!client){status.textContent='Supabase client initialization failed. Verify supabase.js.';return;}
-try{const {data:{session},error:sErr}=await client.auth.getSession();if(sErr||!session){location.replace('admin-login.html');return;}const {data:allowed,error}=await client.rpc('is_super_admin');if(error)throw error;if(allowed!==true){status.textContent='Access denied: this account is not the active Super Administrator.';await client.auth.signOut();return;}status.textContent='Super Administrator verified. Your private workspace is ready.';tools.hidden=false;}catch(e){status.textContent='Could not verify administrator role: '+(e.message||'Unknown error');}
-})();document.getElementById('logout').addEventListener('click',async()=>{if(window.supabaseClient)await window.supabaseClient.auth.signOut();location.replace('admin-login.html');});
-</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101a32">
+  <title>Super Administrator | My Study Station</title>
+  <link rel="stylesheet" href="super-admin.css">
+</head>
+<body data-theme="dark">
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Super Administrator navigation">
+      <a class="brand" href="super-admin.html">
+        <img src="mystudystation-pro-learning-logo.png" alt="" onerror="this.hidden=true">
+        <span><b>MY STUDY STATION</b><small>SUPER ADMINISTRATION</small></span>
+      </a>
+      <div class="owner-chip"><span class="owner-dot"></span> PRIVATE OWNER WORKSPACE</div>
+      <nav id="sideNav">
+        <div class="nav-group"><span class="nav-label">MAIN</span>
+          <a class="nav-link active" href="super-admin.html"><span class="nav-icon">▦</span>Dashboard</a>
+          <a class="nav-link" href="super-admin-section.html?section=analytics"><span class="nav-icon">▥</span>Platform Analytics</a>
+        </div>
+        <div class="nav-group"><span class="nav-label">MANAGEMENT</span>
+          <a class="nav-link" href="super-admin-section.html?section=students"><span class="nav-icon">♙</span>Student Management</a>
+          <a class="nav-link" href="admin-management.html"><span class="nav-icon">♧</span>Administrator Management</a>
+          <a class="nav-link" href="super-admin-section.html?section=schools"><span class="nav-icon">⌂</span>Schools &amp; Communities</a>
+          <a class="nav-link" href="super-admin-section.html?section=subscriptions"><span class="nav-icon">◇</span>Subscriptions</a>
+        </div>
+        <div class="nav-group"><span class="nav-label">CONTENT &amp; SUPPORT</span>
+          <a class="nav-link" href="reels-moderation.html"><span class="nav-icon">▷</span>Content Moderation</a>
+          <a class="nav-link" href="super-admin-section.html?section=community"><span class="nav-icon">◎</span>Community Management</a>
+          <a class="nav-link" href="super-admin-section.html?section=feedback"><span class="nav-icon">✉</span>Client Feedback</a>
+        </div>
+        <div class="nav-group"><span class="nav-label">SECURITY &amp; CONTROL</span>
+          <a class="nav-link" href="super-admin-section.html?section=audit"><span class="nav-icon">▤</span>Audit Logs</a>
+          <a class="nav-link" href="super-admin-section.html?section=security"><span class="nav-icon">⬡</span>Security Centre</a>
+          <a class="nav-link" href="super-admin-section.html?section=settings"><span class="nav-icon">⚙</span>Platform Settings</a>
+        </div>
+        <div class="nav-group"><span class="nav-label">ACCOUNT</span>
+          <a class="nav-link" href="super-admin-section.html?section=profile"><span class="nav-icon">◉</span>My Admin Profile</a>
+        </div>
+        <div class="nav-group"><span class="nav-label">ACCOUNT SECURITY</span><a class="nav-link" href="super-admin-security.html"><span class="nav-icon">⌑</span>Account Security</a></div>
+    </nav>
+      <div class="sidebar-bottom"><span class="secure-mark">✓</span><span>Protected by database role checks</span></div>
+    </aside>
+
+    <div class="mobile-scrim" id="scrim"></div>
+    <main class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-button" id="menuButton" aria-label="Open navigation">☰</button>
+          <button class="icon-button collapse-button" id="collapseButton" aria-label="Collapse sidebar" title="Collapse sidebar">⇤</button>
+          <div><div class="crumb">MY STUDY STATION <span>/</span> OWNER WORKSPACE</div><div class="topbar-title">Super Admin Dashboard</div></div>
+        </div>
+        <div class="topbar-actions">
+          <span class="live-indicator"><i></i> Secure session</span>
+          <button class="icon-button theme-button" id="themeButton" title="Switch theme" aria-label="Switch theme">☀</button>
+          <button class="profile-button" id="profileButton"><span class="avatar">SA</span><span class="profile-label">Super Admin</span><span>⌄</span></button>
+          <button class="signout-button" id="signOutButton">Sign out</button>
+        </div>
+      </header>
+
+      <section class="page-content">
+        <div class="welcome-row">
+          <div><div class="eyebrow">PLATFORM CONTROL CENTRE</div><h1>Platform Overview</h1><p>Monitor your learning platform and access each management area from its dedicated page.</p></div>
+          <button class="refresh-button" id="refreshButton"><span>↻</span> Refresh data</button>
+        </div>
+
+        <div class="notice-bar" id="dataNotice" role="status"><span class="notice-icon">i</span><span>Connecting securely to platform data…</span></div>
+
+        <div class="stats-grid" id="statsGrid">
+          <article class="stat-card stat-blue"><div class="stat-top"><span>Total Students</span><span class="stat-icon">♙</span></div><div class="stat-value" data-count="students">—</div><div class="stat-foot">Registered student profiles</div><div class="stat-glow"></div></article>
+          <article class="stat-card stat-purple"><div class="stat-top"><span>Schools</span><span class="stat-icon">⌂</span></div><div class="stat-value" data-count="schools">—</div><div class="stat-foot">Schools in the platform</div><div class="stat-glow"></div></article>
+          <article class="stat-card stat-gold"><div class="stat-top"><span>Active Administrators</span><span class="stat-icon">♧</span></div><div class="stat-value" data-count="admins">—</div><div class="stat-foot">Active assigned admin roles</div><div class="stat-glow"></div></article>
+          <article class="stat-card stat-green"><div class="stat-top"><span>Pending Content</span><span class="stat-icon">▷</span></div><div class="stat-value" data-count="pending">—</div><div class="stat-foot">Student uploads awaiting review</div><div class="stat-glow"></div></article>
+        </div>
+
+        <div class="dashboard-grid">
+          <section class="panel chart-panel">
+            <div class="panel-heading"><div><h2>Platform data snapshot</h2><p>Current totals from accessible database records</p></div><span class="panel-badge">LIVE COUNTS</span></div>
+            <div class="chart-wrap"><canvas id="overviewChart" aria-label="Platform data snapshot chart" role="img"></canvas><div class="chart-fallback" id="chartFallback" hidden>Chart data is not available yet.</div></div>
+            <div class="chart-legend"><span><i class="legend-blue"></i>Students</span><span><i class="legend-purple"></i>Schools</span><span><i class="legend-gold"></i>Administrators</span><span><i class="legend-green"></i>Pending content</span></div>
+          </section>
+
+          <section class="panel quick-panel">
+            <div class="panel-heading"><div><h2>Quick access</h2><p>Open a dedicated management workspace</p></div></div>
+            <a class="quick-link" href="admin-management.html"><span class="quick-icon purple">♧</span><span><b>Administrator Management</b><small>Appointments, roles and assignments</small></span><span class="arrow">→</span></a>
+            <a class="quick-link" href="reels-moderation.html"><span class="quick-icon green">▷</span><span><b>Content Moderation</b><small>Review student video submissions</small></span><span class="arrow">→</span></a>
+            <a class="quick-link" href="super-admin-section.html?section=students"><span class="quick-icon blue">♙</span><span><b>Student Management</b><small>Student account workspace</small></span><span class="arrow">→</span></a>
+            <a class="quick-link" href="super-admin-section.html?section=schools"><span class="quick-icon gold">⌂</span><span><b>Schools &amp; Communities</b><small>Organise platform locations</small></span><span class="arrow">→</span></a>
+          </section>
+        </div>
+
+        <section class="panel activity-panel">
+          <div class="panel-heading"><div><h2>Platform activity</h2><p>Administrative activity history</p></div><a href="super-admin-section.html?section=audit" class="text-link">Open audit logs →</a></div>
+          <div class="activity-empty"><span class="activity-symbol">◷</span><div><b>Audit log viewer is the next development stage</b><p>This dashboard does not fabricate activity. Recorded events will be displayed after the audit-log page is implemented.</p></div></div>
+        </section>
+        <footer>My Study Station Pro Learning <span>•</span> Private Super Administrator Workspace</footer>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="supabase.js"></script>
+  <script src="super-admin.js"></script>
+</body>
+</html>

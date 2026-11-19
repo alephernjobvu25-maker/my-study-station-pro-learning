@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0d55b7">
+  <title>Student Profile | My Study Station</title>
+  <link rel="stylesheet" href="learning.css">
+  <link rel="stylesheet" href="dashboard-design.css">
+  <link rel="stylesheet" href="student-profile.css">
+  <script src="theme.js"></script>
+</head>
+<body data-area="basic" data-page="student-profile">
+  <header class="app-header">
+    <div class="header-inner student-public-header">
+      <a class="btn btn-soft" id="student-profile-back" href="basic-reels.html">← Back to videos</a>
+      <a class="brand" id="student-profile-brand" href="basic.html"><img src="mystudystation-pro-learning-logo.png" alt=""><span>MY STUDY STATION<small id="student-profile-area">BASIC LEARNING</small></span></a>
+    </div>
+  </header>
+  <main class="page student-public-page">
+    <p id="student-public-status" class="status" role="status" aria-live="polite">Loading student profile…</p>
+    <section id="student-public-content" hidden>
+      <section class="panel student-public-hero">
+        <div class="student-public-avatar" id="student-public-avatar"><span id="student-public-initial">S</span><img id="student-public-photo" alt="Student profile picture" hidden></div>
+        <div class="student-public-identity"><span class="eyebrow">STUDENT PROFILE</span><h1 id="student-public-name">Student creator</h1><p id="student-public-caption">Approved learning videos shared by this student.</p></div>
+      </section>
+      <section class="student-public-videos">
+        <div class="student-public-section-head"><div><span class="eyebrow">LEARNING CONTRIBUTIONS</span><h2>Videos uploaded by this student</h2></div><span class="student-public-count" id="student-public-count">0 videos</span></div>
+        <div id="student-public-video-list" class="student-public-video-list"><div class="empty-state">Loading videos…</div></div>
+      </section>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="app-core.js"></script>
+  <script src="student-profile.js"></script>
+</body>
+</html>

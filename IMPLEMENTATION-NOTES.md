@@ -72,3 +72,11 @@ Static code and archive checks are performed on this working copy. No live Supab
 - Playback waits are guarded so a slow-loading Reel does not begin playing after the student has already moved to another slide.
 - No automatic 3-second unmute, database changes, RLS changes, Storage changes, or changes to existing uploaded media.
 - Static JavaScript/archive checks only; actual Android device playback and live hosting still require user testing.
+
+
+## Student profile header and spacing refinement (2026-11-19)
+- Moved the “My Profile” page title into the shared-style app header beside the My Study Station brand.
+- Kept one Back control and one Settings control in the header; removed repeated Settings and return-to-learning buttons from the page body.
+- Preserved the Basic and Pro color themes and added more consistent spacing between the header, identity card, summary cards and information panels.
+- The header adapts to narrow Android screens without placing a second page title above the profile content.
+- No Supabase schema, RLS, Storage, authentication or student records were changed.

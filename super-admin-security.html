@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light"><title>Account Security | My Study Station Pro Learning</title>
+<style>
+:root{color-scheme:dark;--bg:#090d20;--panel:#121a30;--line:#2b3b5c;--text:#edf3ff;--muted:#a9b6d1;--gold:#f3d276;--accent:#7668e8;--good:#72d6a0;--bad:#ff9da9}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#28235b 0,#090d20 58%);color:var(--text);font:15px system-ui,sans-serif}header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 20px;border-bottom:1px solid var(--line)}.brand{font-weight:850;letter-spacing:.04em}.brand span{color:var(--gold)}.wrap{width:min(760px,calc(100% - 28px));margin:34px auto}.eyebrow{color:var(--gold);font-size:11px;font-weight:800;letter-spacing:.14em}.title{font-size:clamp(26px,5vw,36px);margin:8px 0}.muted{color:var(--muted);line-height:1.6}.card{background:linear-gradient(145deg,rgba(25,35,62,.97),rgba(15,22,42,.97));border:1px solid var(--line);border-radius:20px;padding:24px;margin-top:20px;box-shadow:0 18px 50px #0003}label{display:block;font-weight:700;margin:16px 0 7px}input{width:100%;padding:13px 14px;border:1px solid #435477;border-radius:11px;background:#080f20;color:var(--text);font:inherit;outline:none}input:focus{border-color:var(--gold);box-shadow:0 0 0 3px #f3d27622}button,a{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:11px;padding:12px 16px;background:var(--accent);color:white;text-decoration:none;font:700 14px system-ui;cursor:pointer}button.secondary,a.secondary{background:#202c45;border:1px solid var(--line)}button:disabled{opacity:.6;cursor:wait}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}.message{min-height:22px;margin-top:14px;line-height:1.5}.hint{font-size:13px;color:var(--muted);line-height:1.55}.security-note{border-left:3px solid var(--gold);padding:10px 13px;background:#f3d27612;border-radius:8px;color:#e9dfc2;font-size:13px;line-height:1.55;margin-top:16px}@media(max-width:520px){header{padding:12px}.card{padding:18px}.actions button,.actions a{width:100%}}
+</style></head><body>
+<header><div class="brand">MY STUDY STATION <span>PRO</span></div><a class="secondary" href="super-admin.html">Back to workspace</a></header>
+<main class="wrap"><div class="eyebrow">PERMANENT PLATFORM OWNER</div><h1 class="title">Account Security</h1><p class="muted">Manage the password for your Super Administrator account. Your permanent owner role is separate from your password.</p>
+<section class="card"><h2>Change password</h2><p class="hint">Enter your current password first, then choose and confirm a new password.</p>
+<form id="passwordForm">
+<label for="currentPassword">Current password</label><input id="currentPassword" type="password" autocomplete="current-password" required>
+<label for="newPassword">New password</label><input id="newPassword" type="password" autocomplete="new-password" minlength="10" required>
+<label for="confirmPassword">Confirm new password</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="10" required>
+<div class="security-note">Use a unique password of at least 10 characters. Never share it. This page does not save your password in the website database.</div>
+<div class="actions"><button id="changeBtn" type="submit">Verify current password and update</button></div><p id="message" class="message" role="status" aria-live="polite"></p></form></section>
+<section class="card"><h2>Owner account</h2><p id="ownerEmail" class="muted">Verifying your signed-in account…</p><p class="hint">Password changes are handled by Supabase Auth. Your permanent Super Administrator record is not edited.</p><div class="actions"><button class="secondary" id="signOutBtn" type="button">Sign out</button></div></section></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase.js"></script>
+<script>
+(async function(){
+ const client=window.supabaseClient,form=document.getElementById('passwordForm'),message=document.getElementById('message'),changeBtn=document.getElementById('changeBtn'),ownerEmail=document.getElementById('ownerEmail');
+ const OWNER_ID='cb4dbdc3-65de-4c73-a447-8849290cd644';
+ function say(t,ok=false){message.textContent=t;message.style.color=ok?'var(--good)':'var(--bad)';}
+ if(!client){ownerEmail.textContent='Supabase client could not be initialized. Check supabase.js.';form.hidden=true;return;}
+ const {data:{session},error:sessionError}=await client.auth.getSession();
+ if(sessionError||!session){location.replace('admin-login.html');return;}
+ const {data:userData,error:userError}=await client.auth.getUser();
+ if(userError||!userData.user){location.replace('admin-login.html');return;}
+ if(userData.user.id!==OWNER_ID){ownerEmail.textContent='Access denied: this is not the permanent owner account.';form.hidden=true;await client.auth.signOut();return;}
+ const {data:allowed,error:roleError}=await client.rpc('is_super_admin');
+ if(roleError||allowed!==true){ownerEmail.textContent='Access denied: Super Administrator verification failed.';form.hidden=true;await client.auth.signOut();return;}
+ ownerEmail.textContent='Signed in as '+(userData.user.email||'Permanent Platform Owner');
+ form.addEventListener('submit',async e=>{
+  e.preventDefault();say('');
+  const current=document.getElementById('currentPassword').value,next=document.getElementById('newPassword').value,confirm=document.getElementById('confirmPassword').value;
+  if(next.length<10){say('Your new password must contain at least 10 characters.');return;}
+  if(next!==confirm){say('The new password and confirmation do not match.');return;}
+  if(next===current){say('Choose a password different from your current password.');return;}
+  changeBtn.disabled=true;changeBtn.textContent='Verifying current password…';
+  try{
+   const {error:verifyError}=await client.auth.signInWithPassword({email:userData.user.email,password:current});
+   if(verifyError)throw new Error('The current password could not be verified. Check it and try again.');
+   const {data:verified,error:verifiedError}=await client.auth.getUser();
+   if(verifiedError||!verified.user||verified.user.id!==OWNER_ID)throw new Error('Owner verification failed. No password change was made.');
+   const {error:updateError}=await client.auth.updateUser({password:next});
+   if(updateError)throw updateError;
+   form.reset();say('Your password has been updated successfully through Supabase Auth.',true);
+  }catch(err){say(err.message||'Password update failed. Please try again.');}
+  finally{changeBtn.disabled=false;changeBtn.textContent='Verify current password and update';}
+ });
+ document.getElementById('signOutBtn').addEventListener('click',async()=>{
+  const {error}=await client.auth.signOut();if(error){say('Sign-out failed: '+error.message);return;}location.replace('admin-login.html');
+ });
+})();
+</script></body></html>

@@ -1,1 +1,126 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>My Profile | My Study Station</title><link rel="stylesheet" href="learning.css"><link rel="stylesheet" href="dashboard-design.css"><script src="theme.js"></script></head><body data-area="basic"><header class="app-header"><div class="header-inner"><a class="btn btn-soft" id="profile-back" href="basic.html">← Back</a><span class="brand">MY PROFILE</span></div></header><main class="page"><div class="eyebrow">YOUR ACCOUNT</div><h1 class="page-title">My Profile</h1><p id="profile-status" class="status" role="status">Loading your profile…</p><div id="profile-content" hidden><section class="panel" style="margin-top:18px"><div class="welcome"><div class="avatar" id="profile-avatar" style="width:68px;height:68px;font-size:1.5rem">L</div><div style="flex:1"><h2 id="profile-name">Learner</h2><p class="muted">Your private student profile</p></div></div><div class="grid grid-2"><div class="notice"><small class="muted">Student number</small><h3 id="profile-student-number">Pending</h3></div><div class="notice"><small class="muted">School</small><h3 id="profile-school">Not selected</h3></div><div class="notice"><small class="muted">Account email (private)</small><h3 id="profile-email">Not available</h3></div><div class="notice"><small class="muted">Learning area</small><h3 id="profile-area">Basic</h3></div></div><p class="helper" style="margin-top:14px">This page is your own private profile. Other students cannot use this view to access your account details.</p><a class="btn btn-primary" id="profile-settings" href="settings.html?area=basic">Open Settings</a></section></div></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase.js"></script><script src="app-core.js"></script><script src="profile.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0d55b7">
+  <title>My Profile | My Study Station</title>
+  <link rel="stylesheet" href="learning.css">
+  <link rel="stylesheet" href="dashboard-design.css">
+  <link rel="stylesheet" href="profile-page.css">
+  <script src="theme.js"></script>
+</head>
+<body data-area="basic">
+  <header class="app-header profile-header">
+    <div class="header-inner profile-header-inner">
+      <a class="btn btn-soft profile-back-button" id="profile-back" href="basic.html" aria-label="Back to learning area">← Back</a>
+      <div class="profile-header-center">
+        <div class="profile-brand" aria-label="My Study Station">
+          <img src="mystudystation-pro-learning-logo.png" alt="">
+          <span>MY STUDY STATION<small id="profile-area-label">BASIC LEARNING</small></span>
+        </div>
+        <h1 class="profile-header-title">My Profile</h1>
+      </div>
+      <a class="icon-btn profile-settings-button" id="profile-settings" href="settings.html?area=basic" aria-label="Open profile settings" title="Settings">⚙</a>
+    </div>
+  </header>
+
+  <main class="page profile-page">
+
+    <p id="profile-status" class="status" role="status" aria-live="polite">Loading your profile…</p>
+
+    <div id="profile-content" hidden>
+      <section class="profile-hero panel" aria-labelledby="profile-name">
+        <div class="profile-identity">
+          <div class="profile-avatar-column">
+            <div class="profile-avatar-wrap">
+              <div class="profile-avatar avatar" id="profile-avatar" aria-label="Your profile picture">
+                <span id="profile-avatar-initial">L</span>
+                <img id="profile-avatar-image" alt="Your profile picture" hidden>
+              </div>
+              <span class="profile-avatar-mark" aria-hidden="true">✦</span>
+            </div>
+            <div class="profile-photo-actions">
+              <input id="profile-photo-file" class="sr-only" type="file" accept="image/jpeg,image/png,image/webp">
+              <button class="btn btn-soft profile-photo-button" id="profile-photo-select" type="button">＋ Add profile picture</button>
+              <button class="btn btn-soft btn-danger profile-photo-remove" id="profile-photo-remove" type="button" hidden>Remove picture</button>
+              <p id="profile-photo-status" class="profile-photo-status" role="status" aria-live="polite">Only you can see your picture for now.</p>
+            </div>
+          </div>
+          <div class="profile-identity-copy">
+            <span class="profile-kicker">STUDENT ACCOUNT</span>
+            <h2 id="profile-name">Learner</h2>
+            <p id="profile-subtitle">Your private student profile</p>
+            <div class="profile-badges">
+              <span class="profile-badge" id="profile-membership-badge">Basic Learning</span>
+              <span class="profile-badge profile-badge-soft">Student</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="profile-summary-grid" aria-label="Profile summary">
+        <article class="profile-summary-card">
+          <span class="profile-summary-icon" aria-hidden="true">🎓</span>
+          <div><small>Student number</small><strong id="profile-student-number">Loading…</strong></div>
+        </article>
+        <article class="profile-summary-card">
+          <span class="profile-summary-icon" aria-hidden="true">🏫</span>
+          <div><small>School</small><strong id="profile-school">Loading…</strong></div>
+        </article>
+        <article class="profile-summary-card">
+          <span class="profile-summary-icon" aria-hidden="true">📚</span>
+          <div><small>Learning area</small><strong id="profile-area">Basic Learning</strong></div>
+        </article>
+      </section>
+
+      <div class="profile-content-grid">
+        <section class="panel profile-detail-panel">
+          <div class="profile-section-heading">
+            <span class="profile-section-icon" aria-hidden="true">👤</span>
+            <div><h2>Personal information</h2><p>Information associated with your student account.</p></div>
+          </div>
+          <dl class="profile-detail-list">
+            <div><dt>Display name</dt><dd id="profile-detail-name">Not available</dd></div>
+            <div><dt>Student number</dt><dd id="profile-detail-number">Not available</dd></div>
+            <div><dt>School</dt><dd id="profile-detail-school">Not selected</dd></div>
+            <div><dt>Account created</dt><dd id="profile-created">Not available</dd></div>
+          </dl>
+        </section>
+
+        <section class="panel profile-detail-panel">
+          <div class="profile-section-heading">
+            <span class="profile-section-icon" aria-hidden="true">🔐</span>
+            <div><h2>Account information</h2><p>Private details visible only to you.</p></div>
+          </div>
+          <div class="profile-private-email">
+            <span aria-hidden="true">✉</span>
+            <div><small>Email address</small><strong id="profile-email">Loading…</strong></div>
+            <span class="profile-lock-label">🔒 Private</span>
+          </div>
+          <p class="profile-privacy-note">Your email, phone number, date of birth, home location, login details, payment records and private learning records are never shown to other students.</p>
+          <p class="profile-settings-hint">To manage your account and privacy preferences, use the Settings icon in the header.</p>
+        </section>
+      </div>
+
+      <section class="panel profile-next-panel">
+        <div class="profile-section-heading">
+          <span class="profile-section-icon" aria-hidden="true">🏆</span>
+          <div><h2>Achievements and learning activity</h2><p>Your learning milestones will be shown here when achievement records are connected.</p></div>
+        </div>
+        <div class="profile-coming-grid">
+          <div class="profile-coming-item"><strong>Achievements</strong><span>Achievement records are not connected yet.</span></div>
+          <div class="profile-coming-item"><strong>Learning progress</strong><span>Your private progress remains in your learning area.</span></div>
+          <div class="profile-coming-item"><strong>My uploads</strong><span>Your uploaded learning content will be added here in a later step.</span></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="app-core.js"></script>
+  <script src="profile.js"></script>
+</body>
+</html>

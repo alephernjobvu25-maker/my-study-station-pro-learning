@@ -4,6 +4,24 @@
   const area = document.body.dataset.area || 'pro';
   const status = (message, type='') => { const el=$('home-status') || $('basic-message'); if(el){el.textContent=message;el.className='status '+type;} };
 
+  async function loadOwnProfileAvatar(userId, displayName){
+    const avatar=$('student-avatar');
+    if(!avatar || !userId || !window.MSS?.client())return;
+    const initial=(String(displayName||'Learner').trim()[0]||'L').toUpperCase();
+    avatar.textContent=initial;
+    try{
+      const bucket=MSS.client().storage.from('student-profile-photos');
+      const {data,error}=await bucket.list(userId,{limit:20});
+      if(error)throw error;
+      const file=(data||[]).find(item=>/^profile-avatar\.(jpg|png|webp)$/i.test(item.name));
+      if(!file)return;
+      const {data:signed,error:signedError}=await bucket.createSignedUrl(`${userId}/${file.name}`,3600);
+      if(signedError||!signed?.signedUrl)return;
+      const img=document.createElement('img');img.src=signed.signedUrl;img.alt='';img.loading='eager';
+      img.onerror=()=>{avatar.textContent=initial;avatar.classList.remove('has-profile-photo');};
+      avatar.replaceChildren(img);avatar.classList.add('has-profile-photo');
+    }catch(error){console.warn('Dashboard profile photo could not be loaded:',error.message);}
+  }
   async function loadFeaturedReels(){
     const root=$('home-featured-reels');
     if(!root || !window.MSS || !MSS.client())return;
@@ -59,6 +77,7 @@
       renderHomeProgress(result.user.id);
       if($('student-name')) $('student-name').textContent=name;
       if($('student-avatar')) $('student-avatar').textContent=(name.trim()[0]||'L').toUpperCase();
+      await loadOwnProfileAvatar(result.user.id,name);
       if($('student-number')) $('student-number').textContent=result.profile.student_number||'Pending confirmation';
       if($('school-name')){if(result.profile.school_id){const {data:school}=await MSS.client().from('schools').select('school_name').eq('id',result.profile.school_id).maybeSingle();$('school-name').textContent=school?.school_name||'Selected school';}else $('school-name').textContent='Not selected';}
       if(area==='pro'){
