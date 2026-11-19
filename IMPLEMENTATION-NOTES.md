@@ -61,3 +61,14 @@ Static code and archive checks are performed on this working copy. No live Supab
 - The selected sound preference is carried forward when possible; if Android blocks audible autoplay, the next reel falls back to muted playback so the feed continues.
 - YouTube reels use the YouTube player API to keep autoplay muted first and apply sound after playback begins or after the viewer taps the sound control.
 - Existing native video controls remain available. No database, Storage, RLS, or uploaded media changes were made.
+
+
+## Short-video player refinement (2026-11-19)
+- Both Basic and Pro Reels use the same playback behaviour. A Reel starts autoplay muted when it becomes the active visible slide.
+- The centre Play button remains visible during muted autoplay so the student can deliberately enable sound. After audible playback begins, the centre button hides.
+- Tapping the local video surface pauses and mutes it; the Play button returns. Pressing Play again resumes with sound.
+- When another Reel becomes active, the previous Reel is paused and muted. The newly active Reel starts muted.
+- A local-video seek bar and elapsed/total time display are included. YouTube embeds retain their native player controls for seeking and pausing.
+- Playback waits are guarded so a slow-loading Reel does not begin playing after the student has already moved to another slide.
+- No automatic 3-second unmute, database changes, RLS changes, Storage changes, or changes to existing uploaded media.
+- Static JavaScript/archive checks only; actual Android device playback and live hosting still require user testing.

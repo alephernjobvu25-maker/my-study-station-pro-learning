@@ -44,7 +44,7 @@
   }
   async function mediaUrl(reel) {
     if(reel.source_type==='youtube')
-      return `https://www.youtube-nocookie.com/embed/${encodeURIComponent(reel.youtube_id)}?rel=0&enablejsapi=1&playsinline=1&mute=1&origin=${encodeURIComponent(location.origin)}`;
+      return `https://www.youtube-nocookie.com/embed/${encodeURIComponent(reel.youtube_id)}?rel=0&controls=1&modestbranding=1&enablejsapi=1&playsinline=1&mute=1&origin=${encodeURIComponent(location.origin)}`;
     const {data,error}=await MSS.client().storage.from(BUCKET).createSignedUrl(reel.storage_path,1800);
     if(error)throw error;
     return data.signedUrl;
@@ -88,7 +88,10 @@
           onStateChange: event => {
             const card=frame.closest('.reels-video-slide');
             if (event.data === YT.PlayerState.PLAYING) updateCenterButton(card, true);
-            if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) updateCenterButton(card, false);
+            if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+              try { event.target.mute(); } catch (_) {}
+              updateVolumeButton(card,true);updateCenterButton(card, false);
+            }
             if (event.data === YT.PlayerState.ENDED) advanceToNext(index);
           }
         }
@@ -112,9 +115,17 @@
         video.controls=false; video.playsInline=true; video.setAttribute('playsinline','');
         video.preload=index===0?'auto':'metadata';
         video.muted=true; video.defaultMuted=true; video.setAttribute('muted','');
+        video.volume=1;
         video.addEventListener('play',()=>updateCenterButton(card,true));
-        video.addEventListener('pause',()=>updateCenterButton(card,false));
-        video.addEventListener('ended', () => advanceToNext(index));
+        video.addEventListener('pause',()=>{
+          // Pausing always silences this Reel. The next deliberate Play tap enables sound again.
+          video.muted=true;video.defaultMuted=true;video.setAttribute('muted','');
+          updateVolumeButton(card,true);updateCenterButton(card,false);
+        });
+        video.addEventListener('ended', () => {
+          video.muted=true;video.defaultMuted=true;video.setAttribute('muted','');
+          updateVolumeButton(card,true);updateCenterButton(card,false);advanceToNext(index);
+        });
         const source=node('source'); source.src=url; source.type=reel.mime_type||'video/mp4';
         video.append(source); player.append(video);
       }
@@ -144,10 +155,46 @@
     volumeAction.append(volumeButton,volumeCaption);
     rail.append(volumeAction,action('♡','Like'),action('▢','Comment'),action('↗','Share'));
     const upload=node('a','reel-upload-fab','＋');upload.href=area+'-reels-upload.html';upload.setAttribute('aria-label','Upload a learning video');upload.title='Upload a learning video';rail.append(upload);
+    // A transparent tap surface gives local and YouTube videos the same simple
+    // tap-to-pause / tap-to-resume behaviour without exposing inconsistent native controls.
+    const localVideo=player.querySelector('video');
+    if(localVideo){
+      const tapSurface=node('button','reel-surface-toggle');
+      tapSurface.type='button';
+      tapSurface.setAttribute('aria-label','Pause or play this Reel');
+      tapSurface.addEventListener('click',()=>void toggleCenterPlayback(card));
+      player.append(tapSurface);
+      const progress=node('div','reel-progress-wrap');
+      const time=node('span','reel-time-readout','0:00 / 0:00');
+      const seek=node('input','reel-seek');
+      seek.type='range';seek.min='0';seek.max='1000';seek.step='1';seek.value='0';
+      seek.setAttribute('aria-label','Seek within this video');
+      const clock=seconds=>{
+        if(!Number.isFinite(seconds)||seconds<0)return '0:00';
+        const whole=Math.floor(seconds);return `${Math.floor(whole/60)}:${String(whole%60).padStart(2,'0')}`;
+      };
+      const refreshProgress=()=>{
+        const duration=localVideo.duration||0;
+        const current=localVideo.currentTime||0;
+        if(!seek.matches(':active'))seek.value=String(duration?Math.round(current/duration*1000):0);
+        time.textContent=`${clock(current)} / ${clock(duration)}`;
+      };
+      localVideo.addEventListener('timeupdate',refreshProgress);
+      localVideo.addEventListener('loadedmetadata',refreshProgress);
+      localVideo.addEventListener('durationchange',refreshProgress);
+      seek.addEventListener('input',()=>{
+        const duration=localVideo.duration||0;
+        if(duration){localVideo.currentTime=duration*(Number(seek.value)/1000);refreshProgress();}
+      });
+      seek.addEventListener('click',event=>event.stopPropagation());
+      seek.addEventListener('pointerdown',event=>event.stopPropagation());
+      progress.append(seek,time);player.append(progress);
+    }
+
     const centerButton=node('button','reel-center-control','▶');
     centerButton.type='button';
     centerButton.setAttribute('aria-label','Play video with sound');
-    centerButton.addEventListener('click',()=>void toggleCenterPlayback(card));
+    centerButton.addEventListener('click',event=>{event.stopPropagation();void toggleCenterPlayback(card);});
     player.append(centerButton);
     card.append(player,body,rail);
     return card;
@@ -176,9 +223,12 @@
     const player=playerFor(card);
     const muted=video?video.muted:(player&&typeof player.isMuted==='function'?player.isMuted():true);
     const audiblePlaying=!!playing&&!muted;
-    button.textContent=audiblePlaying?'Ⅱ':'▶';
-    button.setAttribute('aria-label',audiblePlaying?'Pause video':'Play video with sound');
-    button.title=audiblePlaying?'Pause video':'Play video with sound';
+    // Keep the centre Play affordance visible during muted autoplay; hide it only
+    // after the viewer has deliberately started audible playback.
+    button.hidden=audiblePlaying;
+    button.textContent='▶';
+    button.setAttribute('aria-label',muted?'Play video with sound':'Resume video with sound');
+    button.title=muted?'Play video with sound':'Resume video with sound';
     button.classList.toggle('is-playing',audiblePlaying);
   }
   function playerFor(card) {
@@ -223,10 +273,10 @@
       video.muted=nextMuted;video.defaultMuted=nextMuted;
       if(nextMuted)video.setAttribute('muted','');else video.removeAttribute('muted');
       if(!nextMuted&&video.paused){try{await video.play();}catch(_){video.muted=true;video.defaultMuted=true;video.setAttribute('muted','');}}
-      updateVolumeButton(card,video.muted);return;
+      updateVolumeButton(card,video.muted);updateCenterButton(card,!video.paused);return;
     }
     if(player){
-      try{if(player.isMuted()) {pauseAndMuteOtherCards(card);activeCard=card;player.unMute();player.setVolume(100);player.playVideo();updateVolumeButton(card,false);} else {player.mute();updateVolumeButton(card,true);}}catch(_){}
+      try{if(player.isMuted()) {pauseAndMuteOtherCards(card);activeCard=card;player.unMute();player.setVolume(100);player.playVideo();updateVolumeButton(card,false);} else {player.mute();updateVolumeButton(card,true);}updateCenterButton(card,player.getPlayerState()===1);}catch(_){}
     }
   }
   function showTapToPlay(card, video) {
@@ -255,6 +305,8 @@
         window.setTimeout(finish,5000);try { video.load(); } catch (_) { finish(); }
       });
     }
+    // A slow-loading Reel must not start after the viewer has already swiped away.
+    if(activeCard!==card)return false;
     try {
       const result=video.play();if(result&&typeof result.then==='function')await result;
       const fallback=card.querySelector('.reel-play-fallback');if(fallback)fallback.remove();
@@ -267,6 +319,7 @@
     const root=$('reel-feed');
     const next=root?.children[index+1];
     if(!next||!next.classList.contains('reels-video-slide')){
+      pauseAndMuteOtherCards(null);activeCard=null;
       say('reel-status','You have reached the end of the available learning videos.');return;
     }
     pauseAndMuteOtherCards(null);
