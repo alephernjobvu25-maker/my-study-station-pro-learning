@@ -8,5 +8,28 @@
 </style><script src="theme.js"></script></head><body><div class="wrap"><div class="brand"><img src="mystudystation-pro-learning-logo.png" alt="My Study Station Pro Learning logo"></div><section class="panel"><span class="tag">RESTRICTED ADMINISTRATOR ACCESS</span><h1>Administrator sign in</h1><p>Sign in to access your assigned administration workspace.</p><form id="adminLoginForm"><label for="email">Email address</label><input id="email" type="email" autocomplete="username" placeholder="admin@example.com" required><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Enter your password" required><button id="loginBtn" type="submit">Sign in securely</button><div id="message" role="status"></div></form></section><div class="student">Are you a student? <a href="login.html">Go to student login</a></div><div class="security">Administrator permissions are checked against the Supabase database.</div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase.js"></script><script>
 const form=document.getElementById('adminLoginForm'),message=document.getElementById('message'),btn=document.getElementById('loginBtn');
-form.addEventListener('submit',async event=>{event.preventDefault();message.textContent='';btn.disabled=true;btn.textContent='Verifying account…';try{if(!window.supabaseClient)throw new Error('Supabase client was not found. Check supabase.js.');const email=document.getElementById('email').value.trim().toLowerCase(),password=document.getElementById('password').value;const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});if(error)throw error;if(!data.session)throw new Error('Sign-in session was not created.');const {data:isSuper,error:superError}=await supabaseClient.rpc('is_super_admin');if(!superError&&isSuper===true){location.replace('super-admin.html');return;}const {data:isAdmin,error:adminError}=await supabaseClient.rpc('is_platform_admin');if(!adminError&&isAdmin===true){location.replace('admin.html');return;}await supabaseClient.auth.signOut();throw new Error('Access denied. This account has no active administrator role.');}catch(error){message.textContent=error.message||'Sign-in failed. Please try again.';}finally{btn.disabled=false;btn.textContent='Sign in securely';}});
+const explainError=(error)=>{
+ const text=String(error?.message||error||'');
+ if(/failed to fetch|networkerror|load failed|fetch failed/i.test(text)) return 'Could not reach the secure login server. Check your internet connection and try the live Cloudflare website in Chrome. If it also fails there, the Supabase connection must be checked.';
+ if(/invalid login credentials/i.test(text)) return 'The email or password is incorrect. Check both and try again.';
+ if(/email not confirmed/i.test(text)) return 'Please confirm your email before signing in.';
+ return text||'Sign-in failed. Please try again.';
+};
+form.addEventListener('submit',async event=>{
+ event.preventDefault();message.textContent='';btn.disabled=true;btn.textContent='Verifying account…';
+ try{
+  if(!window.supabaseClient) throw new Error('Secure connection is not initialized. Check the Supabase CDN and supabase.js.');
+  const email=document.getElementById('email').value.trim().toLowerCase(),password=document.getElementById('password').value;
+  const {data,error}=await window.supabaseClient.auth.signInWithPassword({email,password});
+  if(error)throw error;
+  if(!data.session)throw new Error('Sign-in session was not created.');
+  const {data:isSuper,error:superError}=await window.supabaseClient.rpc('is_super_admin');
+  if(!superError&&isSuper===true){location.replace('super-admin.html');return;}
+  const {data:isAdmin,error:adminError}=await window.supabaseClient.rpc('is_platform_admin');
+  if(!adminError&&isAdmin===true){location.replace('admin.html');return;}
+  await window.supabaseClient.auth.signOut();
+  throw new Error('Access denied. This account has no active administrator role.');
+ }catch(error){message.textContent=explainError(error);}
+ finally{btn.disabled=false;btn.textContent='Sign in securely';}
+});
 </script></body></html>

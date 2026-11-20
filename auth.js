@@ -1,5 +1,15 @@
 /* Student authentication and membership gate for My Study Station Pro Learning */
 const byId = (id) => document.getElementById(id);
+const getClient = () => window.supabaseClient || null;
+const friendlyError = (error) => {
+  const message = String(error?.message || error || "");
+  if (/failed to fetch|networkerror|load failed|fetch failed/i.test(message)) {
+    return "We could not reach the learning server. Check your internet connection and open the live Cloudflare website in Chrome. If this continues there, the Supabase connection needs checking.";
+  }
+  if (/invalid login credentials/i.test(message)) return "The email or password is incorrect. Check both and try again.";
+  if (/email not confirmed/i.test(message)) return "Please confirm your email using the link sent to your inbox before signing in.";
+  return message || "Something went wrong. Please try again.";
+};
 
 const showMessage = (message, isError = false) => {
   const el = byId("message");
@@ -11,9 +21,10 @@ const showMessage = (message, isError = false) => {
 
 async function loadSchools() {
   const select = byId("school");
-  if (!select) return;
+  const client = getClient();
+  if (!select || !client) return;
   try {
-    const { data, error } = await supabaseClient
+    const { data, error } = await client
       .from("schools")
       .select("id,school_name,is_verified")
       .eq("is_verified", true)
@@ -37,6 +48,8 @@ loadSchools();
 const registerForm = byId("register-form");
 if (registerForm) registerForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  const client = getClient();
+  if (!client) return showMessage("The secure connection is unavailable. Open the live website and try again.", true);
   const displayName = byId("display-name").value.trim();
   const email = byId("email").value.trim().toLowerCase();
   const password = byId("password").value;
@@ -50,7 +63,7 @@ if (registerForm) registerForm.addEventListener("submit", async (event) => {
   button.disabled = true;
   button.textContent = "Creating account…";
   try {
-    const { data, error } = await supabaseClient.auth.signUp({
+    const { data, error } = await client.auth.signUp({
       email,
       password,
       options: {
@@ -66,7 +79,7 @@ if (registerForm) registerForm.addEventListener("submit", async (event) => {
       showMessage("Please check your email to continue.");
     }
   } catch (error) {
-    showMessage(error.message || "Registration failed. Please try again.", true);
+    showMessage(friendlyError(error), true);
   } finally {
     button.disabled = false;
     button.textContent = "Create student account";
@@ -74,7 +87,9 @@ if (registerForm) registerForm.addEventListener("submit", async (event) => {
 });
 
 async function checkMembership(userId) {
-  const { data, error } = await supabaseClient
+  const client = getClient();
+  if (!client) throw new Error("The secure connection is unavailable. Please refresh and try again.");
+  const { data, error } = await client
     .from("memberships")
     .select("status,expires_at,created_at")
     .eq("user_id", userId)
@@ -98,20 +113,22 @@ async function checkMembership(userId) {
 const loginForm = byId("login-form");
 if (loginForm) loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  const client = getClient();
+  if (!client) return showMessage("The secure connection is unavailable. Check your internet connection and open the live website.", true);
   const email = byId("email").value.trim().toLowerCase();
   const password = byId("password").value;
   const button = loginForm.querySelector("button[type=submit]");
   button.disabled = true;
   button.textContent = "Logging in…";
   try {
-    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    const { data, error } = await client.auth.signInWithPassword({ email, password });
     if (error) throw error;
     if (!data.session || !data.user) {
       showMessage("Please confirm your email before logging in.", true);
       return;
     }
     showMessage("Checking your membership…");
-    const { data: superAdmin, error: roleError } = await supabaseClient.rpc("is_super_admin");
+    const { data: superAdmin, error: roleError } = await client.rpc("is_super_admin");
     if (!roleError && superAdmin === true) {
       window.location.replace("pro.html");
       return;
@@ -120,7 +137,7 @@ if (loginForm) loginForm.addEventListener("submit", async (event) => {
     if (membership.active) window.location.replace("pro.html");
     else window.location.replace("basic.html");
   } catch (error) {
-    showMessage(error.message || "Login failed. Please try again.", true);
+    showMessage(friendlyError(error), true);
   } finally {
     button.disabled = false;
     button.textContent = "Log in";
@@ -130,10 +147,16 @@ if (loginForm) loginForm.addEventListener("submit", async (event) => {
 const resetLink = byId("reset-link");
 if (resetLink) resetLink.addEventListener("click", async (event) => {
   event.preventDefault();
+  const client = getClient();
   const email = byId("email").value.trim().toLowerCase();
+  if (!client) return showMessage("The secure connection is unavailable. Open the live website and try again.", true);
   if (!email) return showMessage("Enter your email address first.", true);
-  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + "/login.html"
-  });
-  showMessage(error ? error.message : "If this email is registered, a password reset link will be sent.", !!error);
+  try {
+    const { error } = await client.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + "/login.html"
+    });
+    showMessage(error ? friendlyError(error) : "If this email is registered, a password reset link will be sent.", !!error);
+  } catch (error) {
+    showMessage(friendlyError(error), true);
+  }
 });
